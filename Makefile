@@ -2,10 +2,10 @@ CC = g++
 CFLAGS = -std=c++11 -Wall -Wextra -pedantic 
 CFLAGS += -Icore -Ientity -Irepository -Icontroller -Iutils
 OBJ = core/Request.o core/Response.o core/Json.o core/HttpException.o
-OBJ += entity/Entity.o entity/UserEntity.o
+OBJ += entity/Entity.o entity/User.o
 OBJ += repository/Repository.o repository/FileRepository.o 
 OBJ += controller/Controller.o controller/UserController.o
-OBJ += utils/Session.o main.o
+OBJ += main.o
 TARGET = main
 
 all: $(TARGET)
@@ -24,7 +24,7 @@ core/HttpException.o: core/HttpException.h
 
 entity/Entity.o: entity/Entity.cpp entity/Entity.h
 	$(CC) $(CFLAGS) -c $< -o $@
-entity/UserEntity.o: entity/UserEntity.cpp entity/UserEntity.h
+entity/User.o: entity/User.cpp entity/User.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 repository/Repository.o: repository/Repository.h
@@ -35,9 +35,6 @@ repository/FileRepository.o: repository/FileRepository.cpp repository/FileReposi
 controller/Controller.o: controller/Controller.cpp controller/Controller.h
 	$(CC) $(CFLAGS) -c $< -o $@
 controller/UserController.o: controller/UserController.cpp controller/UserController.h
-	$(CC) $(CFLAGS) -c $< -o $@
-
-utils/Session.o: utils/Session.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 main.o: main.cpp

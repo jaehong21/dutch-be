@@ -1,15 +1,15 @@
 #include <string>
-#include "UserEntity.h"
+#include "User.h"
 
 using namespace std;
 
-UserEntity::UserEntity(string username, string password, string email)
+User::User(string username, string password, string email)
     : uuid(Entity::generateUuidV4()), username(username), password(password), email(email) {}
     
-UserEntity::UserEntity(string uuid, string username, string password, string email)
+User::User(string uuid, string username, string password, string email)
     : uuid(uuid), username(username), password(password), email(email) {}
 
-vector<string> UserEntity::toString() {
+vector<string> User::toString() {
     vector<string> userString;
     userString.push_back(uuid);
     userString.push_back(username);
@@ -18,7 +18,7 @@ vector<string> UserEntity::toString() {
     return userString;
 }
 
-UserEntity UserEntity::toEntity(string entityString) {
+User User::toEntity(string entityString) {
     vector<string> userString;
     string delimiter = ",";
     size_t pos = 0;
@@ -30,9 +30,9 @@ UserEntity UserEntity::toEntity(string entityString) {
     }
     userString.push_back(entityString);
     
-    return UserEntity(userString[0], userString[1], userString[2], userString[3]);
+    return User(userString[0], userString[1], userString[2], userString[3]);
 }
 
-string UserEntity::getUuid() { return uuid; }
-string UserEntity::getUsername() { return username; }
-string UserEntity::getEmail() { return email; }
+string User::getUuid() { return uuid; }
+string User::getUsername() { return username; }
+string User::getEmail() { return email; }

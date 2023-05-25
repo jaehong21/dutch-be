@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 #include "UserController.h"
-#include "UserEntity.h"
+#include "User.h"
 #include "Response.h"
 #include "HttpException.h"
 #include "Json.h"
@@ -26,7 +26,7 @@ void UserController::createUser(int sockfd, const Request& request) {
     map<string, string> queryString = request.getQueryString();
     validQueryString(request, {"username", "password", "email"});
 
-    UserEntity user(queryString["username"], queryString["password"], queryString["email"]);
+    User user(queryString["username"], queryString["password"], queryString["email"]);
     repository->create(user);
 
     Json json = Json("id", user.getUuid())
@@ -49,7 +49,7 @@ void UserController::findOneUser(int sockfd, const Request& request) {
     if (userString.size() == 0) {
         throw BadRequestException("User not found");
     }
-    UserEntity user(userString[0], userString[1], userString[2], userString[3]);
+    User user(userString[0], userString[1], userString[2], userString[3]);
 
     
     Json json = Json("id", user.getUuid())
