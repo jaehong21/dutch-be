@@ -46,8 +46,8 @@ int main()
 
     std::cout << "Listening on port 8080..." << std::endl;
 
-    std::shared_ptr<FileRepository> userRepository = FileRepository::getInstance("users.txt");
-    std::shared_ptr<FileRepository> accountRepository = FileRepository::getInstance("accounts.txt");
+    std::shared_ptr<FileRepository> userRepository = std::make_shared<FileRepository>("users.txt");
+    std::shared_ptr<FileRepository> accountRepository = std::make_shared<FileRepository>("accounts.txt");
     std::shared_ptr<UserController> userController = UserController::getInstance(userRepository, accountRepository);
 
     using RequestHandler = std::function<void(int, const Request&)>;

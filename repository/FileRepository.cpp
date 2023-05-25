@@ -7,15 +7,18 @@
 
 using namespace std;
 
-shared_ptr<FileRepository> FileRepository::instance = nullptr;
+// shared_ptr<FileRepository> FileRepository::instance = nullptr;
 
-shared_ptr<FileRepository> FileRepository::getInstance(string fileName) {
-    if (instance.get() == nullptr) {
-        instance = std::make_shared<FileRepository>(FileRepository());
-        instance->tableName = fileName;
-    }
-    return instance;
-}
+// shared_ptr<FileRepository> FileRepository::getInstance(string fileName) {
+//     if (instance.get() == nullptr) {
+//         instance = std::make_shared<FileRepository>(FileRepository());
+//         instance->tableName = fileName;
+//     }
+//     return instance;
+// }
+
+
+FileRepository::FileRepository(string fileName) : tableName(fileName) {}
 
 void FileRepository::create(Entity& entity) {
     // Get an output file stream for the repository file
