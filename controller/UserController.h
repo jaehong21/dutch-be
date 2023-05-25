@@ -14,7 +14,9 @@ public:
     };
 
     void createUser(int sockfd, const Request& request);
+    void updateUser(int sockfd, const Request& request);
     void findOneUser(int sockfd, const Request& request);
+    void findAllUser(int sockfd, const Request& request);
 
 private:
     static std::shared_ptr<UserController> instance;

@@ -1,13 +1,12 @@
 #pragma once
 
-// #include <memory>
 #include <string>
 #include <vector>
+#include <mutex>
 #include "Repository.h"
 
 class FileRepository : public Repository {
 public:
-    // static std::shared_ptr<FileRepository> getInstance(std::string fileName);
     FileRepository(std::string fileName);
     virtual ~FileRepository() {}
 
@@ -18,8 +17,8 @@ public:
     std::vector<std::vector<std::string>> findAll() const override;
 
 private:
-    // static std::shared_ptr<FileRepository> instance;
     std::string tableName;
+    mutable std::mutex mtx;
 
     std::ofstream getOutputFile();
     std::ifstream getInputFile() const;

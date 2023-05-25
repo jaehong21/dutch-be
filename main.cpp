@@ -56,8 +56,14 @@ int main()
     handlers["POST/user"] = [&userController](int sockfd, const Request& req) {
         userController->createUser(sockfd, req);
     };
+    handlers["PATCH/user"] = [&userController](int sockfd, const Request& req) {
+        userController->updateUser(sockfd, req);
+    };
     handlers["GET/user/find"] = [&userController](int sockfd, const Request& req) {
         userController->findOneUser(sockfd, req);
+    };
+    handlers["GET/user/find/all"] = [&userController](int sockfd, const Request& req) {
+        userController->findAllUser(sockfd, req);
     };
 
     while (true) {
@@ -83,12 +89,12 @@ int main()
                 handlers[key](newsockfd, req);
             } else {
                 // handle case where no route matches...   
-                Response response(404, Json("msg", "Not Found"));
+                Response response(404, Json().add("msg", "Not Found"));
                 response.execute(newsockfd);
             }
         }
         catch(const HttpException& e) {
-            Response response(e.getStatusCode(), Json("msg", e.what()));
+            Response response(e.getStatusCode(), Json().add("msg", e.what()));
             response.execute(newsockfd);
         }
 

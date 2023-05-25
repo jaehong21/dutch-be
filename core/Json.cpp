@@ -6,12 +6,6 @@ using namespace std;
 Json::Json() {
     jsonString = "";
 }
-Json::Json(string key, string value) {
-    add(key, value);
-}
-Json::Json(string key, int value) {
-    add(key, value);
-}
 
 Json& Json::add(string key, string value) {
     jsonString += "\"" + key + "\": \"" + value + "\"" + ",";

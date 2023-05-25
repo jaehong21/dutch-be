@@ -1,5 +1,7 @@
 #include <memory>
+#include <mutex>
 #include <string>
+#include <cstdio>
 #include <fstream>
 #include <sstream>
 #include "FileRepository.h"
@@ -7,20 +9,10 @@
 
 using namespace std;
 
-// shared_ptr<FileRepository> FileRepository::instance = nullptr;
-
-// shared_ptr<FileRepository> FileRepository::getInstance(string fileName) {
-//     if (instance.get() == nullptr) {
-//         instance = std::make_shared<FileRepository>(FileRepository());
-//         instance->tableName = fileName;
-//     }
-//     return instance;
-// }
-
-
 FileRepository::FileRepository(string fileName) : tableName(fileName) {}
 
 void FileRepository::create(Entity& entity) {
+    std::lock_guard<std::mutex> guard(this->mtx);
     // Get an output file stream for the repository file
     ofstream out = this->getOutputFile();
 
@@ -43,13 +35,59 @@ void FileRepository::create(Entity& entity) {
 }
 
 void FileRepository::update(string uuid, Entity& entity) {
+    std::lock_guard<std::mutex> guard(this->mtx);
+
+    // Temporary file
+    string tempFileName = Entity::generateUuidV4() + ".txt";
+    ofstream tempFile(tempFileName);
+    ifstream inputFile = this->getInputFile();
+
+    if (!tempFile.is_open() || !inputFile.is_open()) {
+        throw "File not found";
+    }
+
+    string line;
+
+    // Go through each line in the input file
+    while (getline(inputFile, line)) {
+        stringstream ss(line);
+        string token;
+
+        // Get the uuid from the line
+        getline(ss, token, ',');
+
+        // If the line starts with the provided uuid, update the line
+        if (token == uuid) {
+            vector<string> entityString = entity.toString();
+            for (const string& str : entityString) {
+                tempFile << str;
+
+                // If this is not the last string in the vector, output a comma separator
+                if (&str != &entityString.back()) {
+                    tempFile << ",";
+                }
+            }
+        } else {
+            // If the line does not start with the provided uuid, just write it to the temp file
+            tempFile << line;
+        }
+        tempFile << endl;
+    }
+
+    // Close the input and temp files
+    inputFile.close();
+    tempFile.close();
+
+    // Remove the original file and rename the temp file to the original file's name
+    remove(this->tableName.c_str());
+    rename(tempFileName.c_str(), this->tableName.c_str());
 }
 
 void FileRepository::remove(string uuid) {
-    
 }
 
 vector<string> FileRepository::find(string uuid) const {
+    std::lock_guard<std::mutex> guard(this->mtx);
     ifstream in = this->getInputFile();
 
     bool found = false;
@@ -76,6 +114,7 @@ vector<string> FileRepository::find(string uuid) const {
 }
 
 vector<vector<string>> FileRepository::findAll() const {
+    std::lock_guard<std::mutex> guard(this->mtx);
     ifstream in = this->getInputFile();
 
     vector<vector<string>> result;
