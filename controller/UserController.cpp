@@ -12,22 +12,22 @@ using namespace std;
 
 shared_ptr<UserController> UserController::instance = nullptr;
 
-shared_ptr<UserController> UserController::getInstance(shared_ptr<Repository> repository) {
+shared_ptr<UserController> UserController::getInstance(
+    shared_ptr<Repository> userRepository, shared_ptr<Repository> accountRepository) {
     if (instance.get() == nullptr) {
         instance = std::make_shared<UserController>(UserController());
-        instance->setRepository(repository);
-        instance->setPrefix("/user");
+        instance->userRepository = userRepository;
+        instance->accountRepository = accountRepository;
     }
     return instance;
 }
 
 void UserController::createUser(int sockfd, const Request& request) {
-    shared_ptr<Repository> repository = getRepository();
     map<string, string> queryString = request.getQueryString();
     validQueryString(request, {"username", "password", "email"});
 
     User user(queryString["username"], queryString["password"], queryString["email"]);
-    repository->create(user);
+    this->userRepository->create(user);
 
     Json json = Json("id", user.getUuid())
         .add("username", user.getUsername())
@@ -40,12 +40,10 @@ void UserController::createUser(int sockfd, const Request& request) {
 #include <iostream>
 
 void UserController::findOneUser(int sockfd, const Request& request) {
-    shared_ptr<Repository> repository = getRepository();
-
     map<string, string> queryString = request.getQueryString();
     validQueryString(request, {"id"});
 
-    vector<string> userString = repository->find(queryString["id"]);
+    vector<string> userString = this->userRepository->find(queryString["id"]);
     if (userString.size() == 0) {
         throw BadRequestException("User not found");
     }
