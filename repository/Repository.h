@@ -7,7 +7,7 @@
 class Repository
 {
 public:
-    virtual ~Repository() {};
+    virtual ~Repository() {}
 
     virtual void create(Entity& entity) = 0;
     virtual void update(std::string uuid, Entity& newEntity) = 0;

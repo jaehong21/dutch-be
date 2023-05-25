@@ -7,7 +7,7 @@
 class Response {
 public:
     Response(int statusCode, Json body);
-    ~Response() {};
+    ~Response() {}
 
     void execute(int sockfd);
     std::string getResponse() const;

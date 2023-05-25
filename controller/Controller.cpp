@@ -8,8 +8,8 @@
 
 using namespace std;
 
-void Controller::setRepository(shared_ptr<Repository> repository) { this->repository = repository; };
-shared_ptr<Repository> Controller::getRepository() const { return repository; };
+void Controller::setRepository(shared_ptr<Repository> repository) { this->repository = repository; }
+shared_ptr<Repository> Controller::getRepository() const { return repository; }
 
 bool Controller::handleRequest(string method, string path, const Request& request) {
     return (request.getMethod() == method && startWith(path, request.getRequestPath()));
@@ -29,8 +29,8 @@ bool Controller::validQueryString(const Request& request, vector<string> keys) c
     return valid;
 }
 
-void Controller::setPrefix(string prefix) { this->prefix = prefix; };
-string Controller::getPrefix() const { return this->prefix; };
+void Controller::setPrefix(string prefix) { this->prefix = prefix; }
+string Controller::getPrefix() const { return this->prefix; }
 
 bool Controller::startWith(string prefix, string str) {
     return str.substr(0, prefix.size()) == prefix;

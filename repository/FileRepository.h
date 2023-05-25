@@ -11,7 +11,7 @@ public:
     virtual ~FileRepository() { 
         /// as we are using shared_ptr, we don't need to delete instance
         // delete instance; 
-    };
+    }
 
     void create(Entity& entity) override;
     void update(std::string uuid, Entity& newEntity) override;
@@ -21,7 +21,7 @@ public:
 
 private:
     static std::shared_ptr<FileRepository> instance;
-    FileRepository() {};
+    FileRepository() {}
     std::string tableName;
 
     std::ofstream getOutputFile();
