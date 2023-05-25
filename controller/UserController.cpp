@@ -30,7 +30,8 @@ void UserController::createUser(int sockfd, const Request& request) {
     User user(queryString["username"], queryString["password"], queryString["email"]);
     this->userRepository->create(user);
 
-    UserAccount account(make_shared<User>(user), 0);
+    // NOTE: create user account default as $1000
+    UserAccount account(make_shared<User>(user), 1000);
     this->accountRepository->create(account);
 
     Json json = Json()

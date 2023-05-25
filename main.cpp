@@ -16,6 +16,7 @@
 #include "Json.h"
 #include "FileRepository.h"
 #include "UserController.h"
+#include "AccountController.h"
 
 #define LISTEN_PORT 8080
 #define MAX_BUFFER_SIZE 2048
@@ -49,6 +50,7 @@ int main()
     std::shared_ptr<FileRepository> userRepository = std::make_shared<FileRepository>("users.txt");
     std::shared_ptr<FileRepository> accountRepository = std::make_shared<FileRepository>("accounts.txt");
     std::shared_ptr<UserController> userController = UserController::getInstance(userRepository, accountRepository);
+    std::shared_ptr<AccountController> accountController = AccountController::getInstance(userRepository, accountRepository);
 
     using RequestHandler = std::function<void(int, const Request&)>;
     std::map<std::string, RequestHandler> handlers;
@@ -64,6 +66,10 @@ int main()
     };
     handlers["GET/user/find/all"] = [&userController](int sockfd, const Request& req) {
         userController->findAllUser(sockfd, req);
+    };
+
+    handlers["PATCH/account/user"] = [&accountController](int sockfd, const Request& req) {
+        accountController->updateUserAccount(sockfd, req);
     };
 
     while (true) {

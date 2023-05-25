@@ -8,10 +8,7 @@ class UserController : public Controller {
 public:
     static std::shared_ptr<UserController> getInstance(
         std::shared_ptr<Repository> userRepository, std::shared_ptr<Repository> accountRepository);
-    virtual ~UserController() { 
-        // as we are using shared_ptr, we don't need to delete instance
-        // delete instance; 
-    };
+    virtual ~UserController() {}
 
     void createUser(int sockfd, const Request& request);
     void updateUser(int sockfd, const Request& request);
@@ -20,7 +17,7 @@ public:
 
 private:
     static std::shared_ptr<UserController> instance;
-    UserController() {};
+    UserController() {}
 
     std::shared_ptr<Repository> userRepository;
     std::shared_ptr<Repository> accountRepository;

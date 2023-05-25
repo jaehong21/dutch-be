@@ -69,7 +69,6 @@ vector<string> Request::splitString(const string& text, const string seperator) 
 };
 
 string Request::getData() const { return data; }
-
 string Request::getMethod() const { return method; }
 string Request::getRequestPath() const { return requestPath; }
 string Request::getPath() const {

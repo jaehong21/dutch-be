@@ -7,26 +7,32 @@
 
 class Account : public Entity {
 public:
-    Account(int money) : money(money) {}
+    Account(std::string uuid, std::shared_ptr<User> owner, int money) 
+        : uuid(uuid), owner(owner), money(money) {}
     virtual ~Account() {}
+    std::shared_ptr<User> getOwner() const;
+    std::string getUuid() const;
     void setMoney(int money);
     int getMoney() const;
 
 private:
+    std::string uuid;
+    std::shared_ptr<User> owner;
     int money;
 };
 
-class UserAccount: public Account {
+class UserAccount : public Account {
 public:
     UserAccount(std::shared_ptr<User> owner, int money);
     virtual ~UserAccount() {}
-    void setOwner(std::shared_ptr<User> owner);
-    std::shared_ptr<User> getOwner() const;
-    std::string getUuid() const;
 
     std::vector<std::string> toString() override;
+};
 
-private:
-    std::string uuid;
-    std::shared_ptr<User> owner;
+class DutchAccount : public Account {
+public: 
+    DutchAccount(std::shared_ptr<User> owner, int money);
+    virtual ~DutchAccount() {}
+
+    std::vector<std::string> toString() override;
 };
