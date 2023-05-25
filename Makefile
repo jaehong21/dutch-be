@@ -1,12 +1,12 @@
 CC = g++
-CFLAGS = -std=c++11 -Wall -Wextra -pedantic 
+CFLAGS = -std=c++17 -Wall -Wextra -pedantic 
 CFLAGS += -Icore -Ientity -Irepository -Icontroller -Iutils
 OBJ = core/Request.o core/Response.o core/Json.o core/HttpException.o
-OBJ += entity/Entity.o entity/User.o
+OBJ += entity/Entity.o entity/User.o entity/Account.o
 OBJ += repository/Repository.o repository/FileRepository.o 
 OBJ += controller/Controller.o controller/UserController.o
 OBJ += main.o
-TARGET = main
+TARGET = a.out
 
 all: $(TARGET)
 
@@ -25,6 +25,8 @@ core/HttpException.o: core/HttpException.h
 entity/Entity.o: entity/Entity.cpp entity/Entity.h
 	$(CC) $(CFLAGS) -c $< -o $@
 entity/User.o: entity/User.cpp entity/User.h
+	$(CC) $(CFLAGS) -c $< -o $@
+entity/Account.o: entity/Account.cpp entity/Account.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 repository/Repository.o: repository/Repository.h
