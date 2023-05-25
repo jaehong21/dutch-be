@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "FileRepository.h"
+#include "HttpException.h"
 #include "Entity.h"
 
 using namespace std;
@@ -13,24 +14,18 @@ FileRepository::FileRepository(string fileName) : tableName(fileName) {}
 
 void FileRepository::create(Entity& entity) {
     std::lock_guard<std::mutex> guard(this->mtx);
-    // Get an output file stream for the repository file
     ofstream out = this->getOutputFile();
 
-    // Convert the entity to a vector of strings and output each string to the file
     vector<string> entityString = entity.toString();
     for (const string& str : entityString) {
         out << str;
-
         // If this is not the last string in the vector, output a comma separator
         if (&str != &entityString.back()) {
             out << ",";
         }
     }
-
     // Output a newline character to separate the entity from the next one
     out << endl;
-
-    // Close the output file stream
     out.close();
 }
 
@@ -43,7 +38,7 @@ void FileRepository::update(string uuid, Entity& entity) {
     ifstream inputFile = this->getInputFile();
 
     if (!tempFile.is_open() || !inputFile.is_open()) {
-        throw "File not found";
+        throw InternalServerErrorException("File not found");
     }
 
     string line;
@@ -140,8 +135,7 @@ vector<vector<string>> FileRepository::findAll() const {
 ofstream FileRepository::getOutputFile() {
     ofstream outputFile(this->tableName, std::ios::app);
     if (!outputFile.is_open()) {
-        
-        throw "File not found";
+        throw InternalServerErrorException("File not found");
     } else {
         return outputFile;
     }
@@ -150,7 +144,7 @@ ofstream FileRepository::getOutputFile() {
 ifstream FileRepository::getInputFile() const {
     ifstream inputFile(this->tableName);
     if (!inputFile.is_open()) {
-        throw "File not found";
+        throw InternalServerErrorException("File not found");
     } else {
         return inputFile;
     }

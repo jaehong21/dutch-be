@@ -1,12 +1,13 @@
 #include <string>
 #include <vector>
 #include "Request.h"
+#include "Utils.h"
 
 using namespace std;
 
 Request::Request(const string& request) : data(request) {
     // Split request string by newline character
-    vector<string> contents = splitByNewline(request);
+    vector<string> contents = splitString(request, "\n");
     string firstLine = contents[0];
     size_t pos1 = firstLine.find(' ');
     size_t pos2 = firstLine.find(' ', pos1 + 1);
@@ -35,7 +36,7 @@ map<string, string> Request::getQueryString() const {
 }
 
 string Request::getHeader(string headerKey) const {
-    vector<string> contents = splitByNewline(this->data);
+    vector<string> contents = splitString(this->data, "\n");
     // Parse request method, host, and user agent
     for (const auto& line : contents) {
         string::size_type pos = line.find(": ");
@@ -49,24 +50,6 @@ string Request::getHeader(string headerKey) const {
     }
     return "";
 }
-
-vector<string> Request::splitByNewline(const string& text) const {
-    return splitString(text, "\n");
-};
-
-vector<string> Request::splitString(const string& text, const string seperator) const {
-    vector<string> lines;
-    string::size_type pos = 0, prev = 0;
-    while ((pos = text.find(seperator, prev)) != string::npos) {
-        lines.push_back(text.substr(prev, pos - prev));
-        prev = pos + 1;
-    }
-    if (prev < text.length()) {
-        lines.push_back(text.substr(prev));
-    }
-
-    return lines;
-};
 
 string Request::getData() const { return data; }
 string Request::getMethod() const { return method; }

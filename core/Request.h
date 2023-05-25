@@ -23,8 +23,4 @@ private:
     std::string method;
     std::string requestPath;
     std::string body;
-
-    // std::string setBody(const std::string data);
-    std::vector<std::string> splitByNewline(const std::string& text) const;
-    std::vector<std::string> splitString(const std::string& text, const std::string seperator) const;
 };

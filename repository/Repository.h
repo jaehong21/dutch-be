@@ -4,8 +4,7 @@
 #include <vector>
 #include "Entity.h"
 
-class Repository
-{
+class Repository {
 public:
     virtual ~Repository() {}
 
