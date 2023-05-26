@@ -14,7 +14,6 @@ public:
     std::string getRequestPath() const;
     std::string getPath() const;
     std::string getHeader(std::string headerKey) const;
-    std::string getBody() const;
     std::string getData() const;
 
 private:
@@ -22,5 +21,4 @@ private:
     std::string data;
     std::string method;
     std::string requestPath;
-    std::string body;
 };

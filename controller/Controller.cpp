@@ -5,7 +5,7 @@
 #include "Request.h"
 #include "HttpException.h"
 
-using namespace std;
+using std::string, std::vector, std::map;
 
 bool Controller::handleRequest(string method, string path, const Request& request) {
     return (request.getMethod() == method && startWith(path, request.getRequestPath()));

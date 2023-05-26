@@ -1,6 +1,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -8,13 +9,13 @@
 #include "HttpException.h"
 #include "Entity.h"
 
-using namespace std;
+using std::string, std::vector;
 
 FileRepository::FileRepository(string fileName) : tableName(fileName) {}
 
 void FileRepository::create(Entity& entity) {
     std::lock_guard<std::mutex> guard(this->mtx);
-    ofstream out = this->getOutputFile();
+    std::ofstream out = this->getOutputFile();
 
     vector<string> entityString = entity.toString();
     for (const string& str : entityString) {
@@ -25,7 +26,7 @@ void FileRepository::create(Entity& entity) {
         }
     }
     // Output a newline character to separate the entity from the next one
-    out << endl;
+    out << std::endl;
     out.close();
 }
 
@@ -34,18 +35,17 @@ void FileRepository::update(string uuid, Entity& entity) {
 
     // Temporary file
     string tempFileName = Entity::generateUuidV4() + ".txt";
-    ofstream tempFile(tempFileName);
-    ifstream inputFile = this->getInputFile();
+    std::ofstream tempFile(tempFileName);
+    std::ifstream inputFile = this->getInputFile();
 
     if (!tempFile.is_open() || !inputFile.is_open()) {
         throw InternalServerErrorException("File not found");
     }
 
     string line;
-
     // Go through each line in the input file
     while (getline(inputFile, line)) {
-        stringstream ss(line);
+        std::stringstream ss(line);
         string token;
 
         // Get the uuid from the line
@@ -66,7 +66,7 @@ void FileRepository::update(string uuid, Entity& entity) {
             // If the line does not start with the provided uuid, just write it to the temp file
             tempFile << line;
         }
-        tempFile << endl;
+        tempFile << std::endl;
     }
 
     // Close the input and temp files
@@ -83,7 +83,7 @@ void FileRepository::remove(string uuid) {
 
 vector<string> FileRepository::find(string uuid) const {
     std::lock_guard<std::mutex> guard(this->mtx);
-    ifstream in = this->getInputFile();
+    std::ifstream in = this->getInputFile();
 
     bool found = false;
     vector<string> result;
@@ -91,7 +91,7 @@ vector<string> FileRepository::find(string uuid) const {
 
     // Split the line using comma as the separator
     while (!found && getline(in, line)) {  
-        stringstream ss(line);
+        std::stringstream ss(line);
         string token;
 
         result.clear();
@@ -110,14 +110,14 @@ vector<string> FileRepository::find(string uuid) const {
 
 vector<vector<string>> FileRepository::findAll() const {
     std::lock_guard<std::mutex> guard(this->mtx);
-    ifstream in = this->getInputFile();
+    std::ifstream in = this->getInputFile();
 
     vector<vector<string>> result;
     string line;
 
     // Split the line using comma as the separator
     while (getline(in, line)) { 
-        stringstream ss(line);
+        std::stringstream ss(line);
         string token;
         vector<string> entityString;
 
@@ -132,8 +132,8 @@ vector<vector<string>> FileRepository::findAll() const {
     return result;
 }
 
-ofstream FileRepository::getOutputFile() {
-    ofstream outputFile(this->tableName, std::ios::app);
+std::ofstream FileRepository::getOutputFile() {
+    std::ofstream outputFile(this->tableName, std::ios::app);
     if (!outputFile.is_open()) {
         throw InternalServerErrorException("File not found");
     } else {
@@ -141,8 +141,8 @@ ofstream FileRepository::getOutputFile() {
     }
 }
 
-ifstream FileRepository::getInputFile() const {
-    ifstream inputFile(this->tableName);
+std::ifstream FileRepository::getInputFile() const {
+    std::ifstream inputFile(this->tableName);
     if (!inputFile.is_open()) {
         throw InternalServerErrorException("File not found");
     } else {

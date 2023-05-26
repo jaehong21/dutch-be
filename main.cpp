@@ -47,14 +47,25 @@ int main()
 
     std::cout << "Listening on port 8080..." << std::endl;
 
-    std::shared_ptr<FileRepository> userRepository = std::make_shared<FileRepository>("users.txt");
-    std::shared_ptr<FileRepository> accountRepository = std::make_shared<FileRepository>("accounts.txt");
+    // --- Init repositories and controllers ---
+
+    // uuid, username, password, email
+    std::shared_ptr<FileRepository> userRepository = std::make_shared<FileRepository>("user.txt");
+    // uuid, type, balance
+    std::shared_ptr<FileRepository> accountRepository = std::make_shared<FileRepository>("account.txt");
+    // uuid, type, owner, targetBalance, created_at
+    std::shared_ptr<FileRepository> dutchRepository = std::make_shared<FileRepository>("dutch.txt");
+    // dutch_uuid, user_uuid, amount, send_at
+    std::shared_ptr<FileRepository> ledgerRepository = std::make_shared<FileRepository>("ledger.txt");
+
     std::shared_ptr<UserController> userController = UserController::getInstance(userRepository, accountRepository);
     std::shared_ptr<AccountController> accountController = AccountController::getInstance(userRepository, accountRepository);
 
+    // --- Init request handlers ---
     using RequestHandler = std::function<void(int, const Request&)>;
     std::map<std::string, RequestHandler> handlers;
 
+    // --- Init user handlers ---
     handlers["POST/user"] = [&userController](int sockfd, const Request& req) {
         userController->createUser(sockfd, req);
     };
@@ -68,10 +79,13 @@ int main()
         userController->findAllUser(sockfd, req);
     };
 
+    // --- Init account handlers ---
     handlers["PATCH/account/user"] = [&accountController](int sockfd, const Request& req) {
         accountController->updateUserAccount(sockfd, req);
     };
 
+
+    // --- Start listening for connections ---
     while (true) {
         socklen_t clilen = sizeof(cli_addr);
         int newsockfd = accept(sockfd, (struct sockaddr*) &cli_addr, &clilen);
@@ -103,7 +117,6 @@ int main()
             Response response(e.getStatusCode(), Json().add("msg", e.what()));
             response.execute(newsockfd);
         }
-
 
         close(newsockfd);
     }

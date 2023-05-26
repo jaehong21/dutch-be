@@ -3,31 +3,31 @@
 #include "User.h"
 #include "Account.h"
 
-using namespace std;
+using std::string, std::vector, std::shared_ptr;
 
-void Account::setMoney(int money) { this->money = money; }
-int Account::getMoney() const { return money; }
+void Account::setMoney(int balance) { this->balance = balance; }
+int Account::getMoney() const { return balance; }
 shared_ptr<User> Account::getOwner() const { return owner; }
 string Account::getUuid() const { return uuid; }
 
-UserAccount::UserAccount(shared_ptr<User> owner, int money)
-    : Account(owner->getUuid(), owner, money) {}
+UserAccount::UserAccount(shared_ptr<User> owner, int balance)
+    : Account(owner->getUuid(), owner, balance) {}
 
 vector<string> UserAccount::toString() {
     vector<string> accountString;
     accountString.push_back(this->getUuid());
     accountString.push_back("user");
-    accountString.push_back(to_string(this->getMoney()));
+    accountString.push_back(std::to_string(this->getMoney()));
     return accountString;
 }
 
-DutchAccount::DutchAccount(shared_ptr<User> owner, int money)
-    : Account(owner->getUuid(), owner, money) {}
+DutchAccount::DutchAccount(shared_ptr<User> owner, int balance)
+    : Account(owner->getUuid(), owner, balance) {}
 
 vector<string> DutchAccount::toString() {
     vector<string> accountString;
     accountString.push_back(this->getUuid());
     accountString.push_back("dutch");
-    accountString.push_back(to_string(this->getMoney()));
+    accountString.push_back(std::to_string(this->getMoney()));
     return accountString;
 }

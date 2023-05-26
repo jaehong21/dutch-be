@@ -4,7 +4,7 @@
 #include <string>
 #include "Response.h"
 
-using namespace std;
+using std::string;
 
 Response::Response(int statusCode, Json body)
     : statusCode(statusCode), body(body.getJsonString()) {
@@ -12,9 +12,9 @@ Response::Response(int statusCode, Json body)
 }
 
 string Response::getResponse() const {
-    string response = "HTTP/1.1 " + to_string(statusCode) + " " + getStatusMessage(statusCode) + "\r\n"
+    string response = "HTTP/1.1 " + std::to_string(statusCode) + " " + getStatusMessage(statusCode) + "\r\n"
         + "Content-Type: " + contentType + "\r\n"
-        + "Content-Length: " + to_string(body.length()) + "\r\n"
+        + "Content-Length: " + std::to_string(body.length()) + "\r\n"
         + "\r\n"
         + body;
 

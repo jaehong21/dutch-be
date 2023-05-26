@@ -9,7 +9,9 @@
 #include "HttpException.h"
 #include "Json.h"
 
-using namespace std;
+using std::string, std::vector, std::map, std::shared_ptr;
+
+#define INITIAL_BALANCE 1000
 
 shared_ptr<UserController> UserController::instance = nullptr;
 
@@ -30,8 +32,7 @@ void UserController::createUser(int sockfd, const Request& request) {
     User user(queryString["username"], queryString["password"], queryString["email"]);
     this->userRepository->create(user);
 
-    // NOTE: create user account default as $1000
-    UserAccount account(make_shared<User>(user), 1000);
+    auto account = UserAccount(std::make_shared<User>(user), INITIAL_BALANCE);
     this->accountRepository->create(account);
 
     Json json = Json()

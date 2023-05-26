@@ -1,7 +1,8 @@
 #include <string>
+#include <vector>
 #include "User.h"
 
-using namespace std;
+using std::string, std::vector;
 
 User::User(string username, string password, string email)
     : uuid(Entity::generateUuidV4()), username(username), password(password), email(email) {}
@@ -33,6 +34,6 @@ User User::toEntity(string entityString) {
     return User(userString[0], userString[1], userString[2], userString[3]);
 }
 
-string User::getUuid() { return uuid; }
-string User::getUsername() { return username; }
-string User::getEmail() { return email; }
+string User::getUuid() const { return uuid; }
+string User::getUsername() const { return username; }
+string User::getEmail() const { return email; }

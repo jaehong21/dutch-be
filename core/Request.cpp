@@ -1,13 +1,14 @@
 #include <string>
 #include <vector>
+#include <map>
 #include "Request.h"
 #include "Utils.h"
 
-using namespace std;
+using std::string, std::vector, std::map;
 
 Request::Request(const string& request) : data(request) {
     // Split request string by newline character
-    vector<string> contents = splitString(request, "\n");
+    vector<string> contents = splitStringBySeperator(request, "\n");
     string firstLine = contents[0];
     size_t pos1 = firstLine.find(' ');
     size_t pos2 = firstLine.find(' ', pos1 + 1);
@@ -21,14 +22,14 @@ Request::~Request() {}
 map<string, string> Request::getQueryString() const {
     map<string, string> result;
     string queryStringStr = this->requestPath.substr(this->requestPath.find('?') + 1);
-    vector<string> queryStrings = splitString(queryStringStr, "&");
+    vector<string> queryStrings = splitStringBySeperator(queryStringStr, "&");
 
     for (const auto& query : queryStrings) {
         size_t pos = query.find('=');
         if (pos != string::npos) {
             string key = query.substr(0, pos);
             string value = query.substr(pos + 1);
-            result.insert(pair<string, string>(key, value));
+            result.insert(std::pair<string, string>(key, value));
         }
     }
 
@@ -36,7 +37,7 @@ map<string, string> Request::getQueryString() const {
 }
 
 string Request::getHeader(string headerKey) const {
-    vector<string> contents = splitString(this->data, "\n");
+    vector<string> contents = splitStringBySeperator(this->data, "\n");
     // Parse request method, host, and user agent
     for (const auto& line : contents) {
         string::size_type pos = line.find(": ");
@@ -62,4 +63,3 @@ string Request::getPath() const {
     }
     return path;
 }
-string Request::getBody() const { return body; }

@@ -4,13 +4,13 @@
 #include <map>
 #include <exception>
 #include "AccountController.h"
-#include "Account.h"
 #include "User.h"
+#include "Account.h"
 #include "Response.h"
 #include "HttpException.h"
 #include "Json.h"
 
-using namespace std;
+using std::string, std::vector, std::map, std::shared_ptr;
 
 shared_ptr<AccountController> AccountController::instance = nullptr;
 
@@ -25,33 +25,33 @@ shared_ptr<AccountController> AccountController::getInstance(
 }
 
 void AccountController::updateUserAccount(int sockfd, const Request& request) {
-    map<string, string> queryString = request.getQueryString();
-    validQueryString(request, {"uuid", "money"});
+    map<string, string> query = request.getQueryString();
+    validQueryString(request, {"uuid", "balance"});
 
-    int money;
+    int balance;
     try {
-        money = stoi(queryString["money"]);
+        balance = stoi(query["balance"]);
     } catch (const std::exception& e) {
-        throw BadRequestException("Money must be integer");
+        throw BadRequestException("Balance must be integer");
     }
 
-    vector<string> accountString = this->accountRepository->find(queryString["uuid"]);
+    vector<string> accountString = this->accountRepository->find(query["uuid"]);
     if (accountString.size() == 0) {
         throw BadRequestException("Account not found");
     }
-    vector<string> userString = this->userRepository->find(queryString["uuid"]);
+    vector<string> userString = this->userRepository->find(query["uuid"]);
     if (userString.size() == 0) {
         throw BadRequestException("User not found");
     }
 
     auto newAccount = UserAccount(
-        make_shared<User>(userString[0], userString[1], userString[2], userString[3]), money);
+        make_shared<User>(userString[0], userString[1], userString[2], userString[3]), balance);
 
-    this->accountRepository->update(queryString["uuid"], newAccount);
+    this->accountRepository->update(query["uuid"], newAccount);
 
     Json json = Json()
         .add("uuid", newAccount.getUuid())
-        .add("money", newAccount.getMoney());
+        .add("balance", newAccount.getMoney());
 
     Response response(201, json);
     response.execute(sockfd);

@@ -1,7 +1,8 @@
 #include <string>
+#include <vector>
 #include "Json.h"
 
-using namespace std;
+using std::string, std::vector;
 
 Json::Json() {
     jsonString = "";
@@ -13,7 +14,7 @@ Json& Json::add(string key, string value) {
 }
 
 Json& Json::add(string key, int value) {
-    jsonString += "\"" + key + "\": " + to_string(value) + ",";
+    jsonString += "\"" + key + "\": " + std::to_string(value) + ",";
     return *this;
 }
 
