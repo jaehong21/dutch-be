@@ -4,6 +4,7 @@
 #include <string>
 #include "Entity.h"
 #include "User.h"
+#include "Dutch.h"
 
 class Account : public Entity {
 public:
@@ -31,8 +32,12 @@ public:
 
 class DutchAccount : public Account {
 public: 
-    DutchAccount(std::shared_ptr<User> owner, int balance);
+    DutchAccount(std::shared_ptr<Dutch> dutch, std::shared_ptr<User> owner, int balance);
     virtual ~DutchAccount() {}
 
+    std::shared_ptr<Dutch> getDutch() const;
     std::vector<std::string> toString() override;
+
+private:
+    std::shared_ptr<Dutch> dutch;
 };

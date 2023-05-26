@@ -21,8 +21,10 @@ vector<string> UserAccount::toString() {
     return accountString;
 }
 
-DutchAccount::DutchAccount(shared_ptr<User> owner, int balance)
-    : Account(owner->getUuid(), owner, balance) {}
+DutchAccount::DutchAccount(shared_ptr<Dutch> dutch, shared_ptr<User> owner, int balance)
+    : Account(dutch->getUuid(), owner, balance), dutch(dutch) {}
+
+shared_ptr<Dutch> DutchAccount::getDutch() const { return dutch; }
 
 vector<string> DutchAccount::toString() {
     vector<string> accountString;

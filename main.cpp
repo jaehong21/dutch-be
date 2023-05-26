@@ -12,11 +12,15 @@
 
 #include "Request.h"
 #include "Response.h"
-#include "HttpException.h"
 #include "Json.h"
+#include "HttpException.h"
+
 #include "FileRepository.h"
 #include "UserController.h"
 #include "AccountController.h"
+#include "DutchController.h"
+
+using std::string, std::vector, std::map, std::shared_ptr;
 
 #define LISTEN_PORT 8080
 #define MAX_BUFFER_SIZE 2048
@@ -50,20 +54,21 @@ int main()
     // --- Init repositories and controllers ---
 
     // uuid, username, password, email
-    std::shared_ptr<FileRepository> userRepository = std::make_shared<FileRepository>("user.txt");
+    shared_ptr<FileRepository> userRepository = std::make_shared<FileRepository>("user.txt");
     // uuid, type, balance
-    std::shared_ptr<FileRepository> accountRepository = std::make_shared<FileRepository>("account.txt");
-    // uuid, type, owner, targetBalance, created_at
-    std::shared_ptr<FileRepository> dutchRepository = std::make_shared<FileRepository>("dutch.txt");
+    shared_ptr<FileRepository> accountRepository = std::make_shared<FileRepository>("account.txt");
+    // uuid, type, owner, targetBalance
+    shared_ptr<FileRepository> dutchRepository = std::make_shared<FileRepository>("dutch.txt");
     // dutch_uuid, user_uuid, amount, send_at
-    std::shared_ptr<FileRepository> ledgerRepository = std::make_shared<FileRepository>("ledger.txt");
+    shared_ptr<FileRepository> ledgerRepository = std::make_shared<FileRepository>("ledger.txt");
 
-    std::shared_ptr<UserController> userController = UserController::getInstance(userRepository, accountRepository);
-    std::shared_ptr<AccountController> accountController = AccountController::getInstance(userRepository, accountRepository);
+    shared_ptr<UserController> userController = UserController::getInstance(userRepository, accountRepository);
+    shared_ptr<AccountController> accountController = AccountController::getInstance(userRepository, accountRepository);
+    shared_ptr<DutchController> dutchController = DutchController::getInstance(userRepository, accountRepository, dutchRepository, ledgerRepository);
 
     // --- Init request handlers ---
     using RequestHandler = std::function<void(int, const Request&)>;
-    std::map<std::string, RequestHandler> handlers;
+    map<string, RequestHandler> handlers;
 
     // --- Init user handlers ---
     handlers["POST/user"] = [&userController](int sockfd, const Request& req) {
@@ -84,6 +89,11 @@ int main()
         accountController->updateUserAccount(sockfd, req);
     };
 
+    // --- Init dutch handlers ---
+    handlers["POST/dutch/normal"] = [&dutchController](int sockfd, const Request& req) {
+        dutchController->createNormalDutch(sockfd, req);
+    };
+
 
     // --- Start listening for connections ---
     while (true) {
@@ -100,10 +110,10 @@ int main()
             std::cerr << "Error receiving data" << std::endl;
             continue;
         }
-        std::string request(buffer, num_bytes);
+        string request(buffer, num_bytes);
         const Request req(request);
 
-        std::string key = req.getMethod() + req.getPath();
+        string key = req.getMethod() + req.getPath();
         try {
             if (handlers.count(key) > 0) {
                 handlers[key](newsockfd, req);

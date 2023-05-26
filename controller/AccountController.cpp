@@ -36,20 +36,18 @@ void AccountController::updateUserAccount(int sockfd, const Request& request) {
     }
 
     vector<string> accountString = this->accountRepository->find(query["uuid"]);
-    if (accountString.size() == 0) {
-        throw BadRequestException("Account not found");
-    }
+    if (accountString.size() == 0) throw BadRequestException("Account not found");
+    
     vector<string> userString = this->userRepository->find(query["uuid"]);
-    if (userString.size() == 0) {
-        throw BadRequestException("User not found");
-    }
+    if (userString.size() < 4) throw BadRequestException("User not found");
+    
 
     auto newAccount = UserAccount(
         make_shared<User>(userString[0], userString[1], userString[2], userString[3]), balance);
 
     this->accountRepository->update(query["uuid"], newAccount);
 
-    Json json = Json()
+    auto json = Json()
         .add("uuid", newAccount.getUuid())
         .add("balance", newAccount.getMoney());
 

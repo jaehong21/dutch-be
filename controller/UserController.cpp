@@ -35,7 +35,7 @@ void UserController::createUser(int sockfd, const Request& request) {
     auto account = UserAccount(std::make_shared<User>(user), INITIAL_BALANCE);
     this->accountRepository->create(account);
 
-    Json json = Json()
+    auto json = Json()
         .add("uuid", user.getUuid())
         .add("username", user.getUsername())
         .add("email", user.getEmail());
@@ -49,15 +49,14 @@ void UserController::updateUser(int sockfd, const Request& request) {
     validQueryString(request, {"uuid", "username"});
 
     vector<string> userString = this->userRepository->find(queryString["uuid"]);
-    if (userString.size() == 0) {
-        throw BadRequestException("User not found");
-    }
+    if (userString.size() == 0) throw BadRequestException("User not found");
+
     auto user = User(userString[0], userString[1], userString[2], userString[3]);
     auto newUser = User(user.getUuid(), queryString["username"], userString[2], user.getEmail());
 
     this->userRepository->update(user.getUuid(), newUser);
 
-    Json json = Json()
+    auto json = Json()
         .add("uuid", newUser.getUuid())
         .add("username", newUser.getUsername())
         .add("email", newUser.getEmail());
@@ -71,13 +70,12 @@ void UserController::findOneUser(int sockfd, const Request& request) {
     validQueryString(request, {"uuid"});
 
     vector<string> userString = this->userRepository->find(queryString["uuid"]);
-    if (userString.size() == 0) {
-        throw BadRequestException("User not found");
-    }
+    if (userString.size() == 0) throw BadRequestException("User not found");
+    
     auto user = User(userString[0], userString[1], userString[2], userString[3]);
 
     
-    Json json = Json()
+    auto json = Json()
         .add("uuid", user.getUuid())
         .add("username", user.getUsername())
         .add("email", user.getEmail());
@@ -93,8 +91,7 @@ void UserController::findAllUser(int sockfd, const Request& request) {
         userList.push_back(userString[0]);
     }
 
-    Json json = Json()
-        .add("user_list", userList);
+    auto json = Json().add("user_list", userList);
 
     Response response(200, json);
     response.execute(sockfd);
