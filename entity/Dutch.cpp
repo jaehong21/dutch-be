@@ -1,6 +1,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <ctime>
 #include "Dutch.h"
 
 using std::string, std::vector, std::shared_ptr;
@@ -35,6 +36,11 @@ Ledger::Ledger(shared_ptr<Dutch> dutch, shared_ptr<User> user, int amount)
     : dutch(dutch), user(user), amount(amount), sendTime(-1) {}
 Ledger::Ledger(shared_ptr<Dutch> dutch, shared_ptr<User> user, int amount, long sendTime)
     : dutch(dutch), user(user), amount(amount), sendTime(sendTime) {}
+
+void Ledger::setSendTime() {
+    std::time_t t = std::time(nullptr);
+    this->sendTime = static_cast<long>(t);
+}
 
 vector<string> Ledger::toString() {
     vector<string> ledgerString;

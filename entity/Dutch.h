@@ -40,6 +40,7 @@ public:
     Ledger(std::shared_ptr<Dutch> dutch, std::shared_ptr<User> user, int amount, long sendTime);
     virtual ~Ledger() {}
 
+    void setSendTime();
     std::vector<std::string> toString() override;
 
 private:
