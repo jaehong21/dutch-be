@@ -1,12 +1,12 @@
+#include "User.h"
 #include <string>
 #include <vector>
-#include "User.h"
 
 using std::string, std::vector;
 
 User::User(string username, string password, string email)
     : uuid(Entity::generateUuidV4()), username(username), password(password), email(email) {}
-    
+
 User::User(string uuid, string username, string password, string email)
     : uuid(uuid), username(username), password(password), email(email) {}
 

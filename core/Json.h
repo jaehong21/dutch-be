@@ -4,15 +4,15 @@
 #include <vector>
 
 class Json {
-public:
+  public:
     Json();
     ~Json() {}
-    
-    Json& add(std::string key, std::string value);
-    Json& add(std::string key, int value);
-    Json& add(std::string key, std::vector<std::string> value);
+
+    Json &add(std::string key, std::string value);
+    Json &add(std::string key, int value);
+    Json &add(std::string key, std::vector<std::string> value);
     std::string getJsonString();
 
-private:
+  private:
     std::string jsonString;
 };

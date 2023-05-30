@@ -1,15 +1,18 @@
+#include "Dutch.h"
+#include <ctime>
 #include <memory>
 #include <string>
 #include <vector>
-#include <ctime>
-#include "Dutch.h"
 
 using std::string, std::vector, std::shared_ptr;
 
 Dutch::Dutch(int targetBalance, shared_ptr<User> owner, vector<shared_ptr<User>> userList)
-    : uuid(Entity::generateUuidV4()), targetBalance(targetBalance), owner(owner), userList(userList), sendUserList(vector<shared_ptr<User>>()) {}
-Dutch::Dutch(string uuid, int targetBalance, shared_ptr<User> owner, vector<shared_ptr<User>> userList, vector<shared_ptr<User>> sendUserList)
-    : uuid(uuid), targetBalance(targetBalance), owner(owner), userList(userList), sendUserList(sendUserList) {}
+    : uuid(Entity::generateUuidV4()), targetBalance(targetBalance), owner(owner),
+      userList(userList), sendUserList(vector<shared_ptr<User>>()) {}
+Dutch::Dutch(string uuid, int targetBalance, shared_ptr<User> owner,
+             vector<shared_ptr<User>> userList, vector<shared_ptr<User>> sendUserList)
+    : uuid(uuid), targetBalance(targetBalance), owner(owner), userList(userList),
+      sendUserList(sendUserList) {}
 
 string Dutch::getUuid() const { return uuid; }
 int Dutch::getTargetBalance() const { return targetBalance; }
@@ -17,9 +20,11 @@ shared_ptr<User> Dutch::getOwner() const { return owner; }
 vector<shared_ptr<User>> Dutch::getUserList() const { return userList; }
 vector<shared_ptr<User>> Dutch::getSendUserList() const { return sendUserList; }
 
-NormalDutch::NormalDutch(int targetBalance, shared_ptr<User> owner, vector<shared_ptr<User>> userList)
+NormalDutch::NormalDutch(int targetBalance, shared_ptr<User> owner,
+                         vector<shared_ptr<User>> userList)
     : Dutch(targetBalance, owner, userList) {}
-NormalDutch::NormalDutch(string uuid, int targetBalance, shared_ptr<User> owner, vector<shared_ptr<User>> userList, vector<shared_ptr<User>> sendUserList)
+NormalDutch::NormalDutch(string uuid, int targetBalance, shared_ptr<User> owner,
+                         vector<shared_ptr<User>> userList, vector<shared_ptr<User>> sendUserList)
     : Dutch(uuid, targetBalance, owner, userList, sendUserList) {}
 
 vector<string> NormalDutch::toString() {

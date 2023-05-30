@@ -4,7 +4,7 @@
 #include <vector>
 
 class Entity {
-public:
+  public:
     virtual ~Entity() {}
     virtual std::vector<std::string> toString() = 0;
     static std::string generateUuidV4();

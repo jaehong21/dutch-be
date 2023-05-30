@@ -1,12 +1,12 @@
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 class Request {
-public:
-    Request(const std::string& request);
+  public:
+    Request(const std::string &request);
     ~Request();
 
     std::map<std::string, std::string> getQueryString() const;
@@ -16,7 +16,7 @@ public:
     std::string getHeader(std::string headerKey) const;
     std::string getData() const;
 
-private:
+  private:
     // whole request bytes to string
     std::string data;
     std::string method;

@@ -1,8 +1,8 @@
-#include <string>
-#include <random>
-#include <chrono>
-#include <vector>
 #include "Entity.h"
+#include <chrono>
+#include <random>
+#include <string>
+#include <vector>
 
 /**
  * Generates a random UUID version 4 string.
@@ -23,8 +23,8 @@ std::string Entity::generateUuidV4() {
 
     // Convert the UUID components to a string
     char buffer[37];
-    std::snprintf(buffer, sizeof(buffer), "%08X-%04X-%04X-%04X-%012llX",
-                    time_low, time_mid, time_hi_and_version, clock_seq, node);
+    std::snprintf(buffer, sizeof(buffer), "%08X-%04X-%04X-%04X-%012llX", time_low, time_mid,
+                  time_hi_and_version, clock_seq, node);
 
     std::string uuid(buffer);
     std::transform(uuid.begin(), uuid.end(), uuid.begin(), ::tolower); // Convert to lowercase

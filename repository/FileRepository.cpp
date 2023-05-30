@@ -1,24 +1,24 @@
-#include <memory>
-#include <mutex>
-#include <string>
-#include <vector>
+#include "FileRepository.h"
+#include "Entity.h"
+#include "HttpException.h"
 #include <cstdio>
 #include <fstream>
+#include <memory>
+#include <mutex>
 #include <sstream>
-#include "FileRepository.h"
-#include "HttpException.h"
-#include "Entity.h"
+#include <string>
+#include <vector>
 
 using std::string, std::vector;
 
 FileRepository::FileRepository(string fileName) : tableName(fileName) {}
 
-void FileRepository::create(Entity& entity) {
+void FileRepository::create(Entity &entity) {
     std::lock_guard<std::mutex> guard(this->mtx);
     std::ofstream out = this->getOutputFile();
 
     vector<string> entityString = entity.toString();
-    for (const string& str : entityString) {
+    for (const string &str : entityString) {
         out << str;
         // If this is not the last string in the vector, output a comma separator
         if (&str != &entityString.back()) {
@@ -30,7 +30,7 @@ void FileRepository::create(Entity& entity) {
     out.close();
 }
 
-void FileRepository::update(string uuid, Entity& entity) {
+void FileRepository::update(string uuid, Entity &entity) {
     std::lock_guard<std::mutex> guard(this->mtx);
 
     // Temporary file
@@ -54,7 +54,7 @@ void FileRepository::update(string uuid, Entity& entity) {
         // If the line starts with the provided uuid, update the line
         if (token == uuid) {
             vector<string> entityString = entity.toString();
-            for (const string& str : entityString) {
+            for (const string &str : entityString) {
                 tempFile << str;
 
                 // If this is not the last string in the vector, output a comma separator
@@ -78,8 +78,7 @@ void FileRepository::update(string uuid, Entity& entity) {
     rename(tempFileName.c_str(), this->tableName.c_str());
 }
 
-void FileRepository::remove(string uuid) {
-}
+void FileRepository::remove(string uuid) {}
 
 vector<string> FileRepository::find(string uuid) const {
     std::lock_guard<std::mutex> guard(this->mtx);
@@ -90,7 +89,7 @@ vector<string> FileRepository::find(string uuid) const {
     string line;
 
     // Split the line using comma as the separator
-    while (!found && getline(in, line)) {  
+    while (!found && getline(in, line)) {
         std::stringstream ss(line);
         string token;
 
@@ -100,7 +99,7 @@ vector<string> FileRepository::find(string uuid) const {
                 found = true;
             }
             // Add each token to the results vector
-            result.push_back(token);  
+            result.push_back(token);
         }
     }
 
@@ -116,14 +115,14 @@ vector<vector<string>> FileRepository::findAll() const {
     string line;
 
     // Split the line using comma as the separator
-    while (getline(in, line)) { 
+    while (getline(in, line)) {
         std::stringstream ss(line);
         string token;
         vector<string> entityString;
 
         while (getline(ss, token, ',')) {
             // Add each token to the results vector
-            entityString.push_back(token); 
+            entityString.push_back(token);
         }
         result.push_back(entityString);
     }

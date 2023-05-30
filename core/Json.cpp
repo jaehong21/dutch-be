@@ -1,24 +1,22 @@
+#include "Json.h"
 #include <string>
 #include <vector>
-#include "Json.h"
 
 using std::string, std::vector;
 
-Json::Json() {
-    jsonString = "";
-}
+Json::Json() { jsonString = ""; }
 
-Json& Json::add(string key, string value) {
+Json &Json::add(string key, string value) {
     jsonString += "\"" + key + "\": \"" + value + "\"" + ",";
     return *this;
 }
 
-Json& Json::add(string key, int value) {
+Json &Json::add(string key, int value) {
     jsonString += "\"" + key + "\": " + std::to_string(value) + ",";
     return *this;
 }
 
-Json& Json::add(string key, vector<string> value) {
+Json &Json::add(string key, vector<string> value) {
     jsonString += "\"" + key + "\": [";
     for (int i = 0; i < value.size(); ++i) {
         jsonString += "\"" + value[i] + "\"";
@@ -30,9 +28,9 @@ Json& Json::add(string key, vector<string> value) {
     return *this;
 }
 
-string Json::getJsonString() { 
+string Json::getJsonString() {
     jsonString.pop_back(); // remove last comma
     jsonString = "{" + jsonString + "}";
 
-    return jsonString; 
+    return jsonString;
 }

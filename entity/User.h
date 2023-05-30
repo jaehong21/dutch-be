@@ -1,10 +1,10 @@
 #pragma once
 
-#include <string>
 #include "Entity.h"
+#include <string>
 
 class User : public Entity {
-public:
+  public:
     User(std::string username, std::string password, std::string email);
     User(std::string uuid, std::string username, std::string password, std::string email);
     virtual ~User() {}
@@ -15,7 +15,7 @@ public:
 
     std::vector<std::string> toString() override;
 
-private:
+  private:
     std::string uuid;
     std::string username;
     std::string password;

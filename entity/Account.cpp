@@ -1,7 +1,7 @@
+#include "Account.h"
+#include "User.h"
 #include <memory>
 #include <string>
-#include "User.h"
-#include "Account.h"
 
 using std::string, std::vector, std::shared_ptr;
 

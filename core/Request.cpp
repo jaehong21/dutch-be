@@ -1,18 +1,18 @@
-#include <string>
-#include <vector>
-#include <map>
 #include "Request.h"
 #include "Utils.h"
+#include <map>
+#include <string>
+#include <vector>
 
 using std::string, std::vector, std::map;
 
-Request::Request(const string& request) : data(request) {
+Request::Request(const string &request) : data(request) {
     // Split request string by newline character
     vector<string> contents = Utils::splitStringBySeperator(request, "\n");
     string firstLine = contents[0];
     size_t pos1 = firstLine.find(' ');
     size_t pos2 = firstLine.find(' ', pos1 + 1);
-    
+
     this->method = firstLine.substr(0, pos1);
     this->requestPath = firstLine.substr(pos1 + 1, pos2 - pos1 - 1);
 }
@@ -24,7 +24,7 @@ map<string, string> Request::getQueryString() const {
     string queryStringStr = this->requestPath.substr(this->requestPath.find('?') + 1);
     vector<string> queryStrings = Utils::splitStringBySeperator(queryStringStr, "&");
 
-    for (const auto& query : queryStrings) {
+    for (const auto &query : queryStrings) {
         size_t pos = query.find('=');
         if (pos != string::npos) {
             string key = query.substr(0, pos);
@@ -39,7 +39,7 @@ map<string, string> Request::getQueryString() const {
 string Request::getHeader(string headerKey) const {
     vector<string> contents = Utils::splitStringBySeperator(this->data, "\n");
     // Parse request method, host, and user agent
-    for (const auto& line : contents) {
+    for (const auto &line : contents) {
         string::size_type pos = line.find(": ");
         if (pos != string::npos) {
             string key = line.substr(0, pos);
