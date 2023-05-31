@@ -32,7 +32,7 @@ entity/Account.o: entity/Account.cpp entity/Account.h
 entity/Dutch.o: entity/Dutch.cpp entity/Dutch.h 
 	$(CC) $(CFLAGS) -c $< -o $@
 
-repository/Repository.o: repository/Repository.h
+repository/Repository.o: repository/Repository.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 repository/FileRepository.o: repository/FileRepository.cpp repository/FileRepository.h
 	$(CC) $(CFLAGS) -c $< -o $@
