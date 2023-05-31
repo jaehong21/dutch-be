@@ -1,4 +1,4 @@
-FROM arm64v8/gcc:latest
+FROM gcc:latest
 
 WORKDIR /app
 COPY . .

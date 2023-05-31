@@ -1,6 +1,6 @@
 #include "FileRepository.h"
 #include "Entity.h"
-#include "HttpException.cpp"
+#include "HttpException.h"
 #include <cstdio>
 #include <fstream>
 #include <memory>

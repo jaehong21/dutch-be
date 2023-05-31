@@ -1,10 +1,10 @@
 #include "DutchController.h"
 #include "Account.h"
 #include "Dutch.h"
-#include "HttpException.cpp"
+#include "HttpException.h"
 #include "Request.h"
 #include "User.h"
-#include "Utils.cpp"
+#include "Utils.h"
 #include <memory>
 
 using std::string, std::vector, std::map, std::shared_ptr;

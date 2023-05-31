@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "HttpException.cpp"
+#include "HttpException.h"
 #include "Json.h"
 #include "Request.h"
 #include "Response.h"

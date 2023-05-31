@@ -1,6 +1,6 @@
 #include "UserController.h"
 #include "Account.h"
-#include "HttpException.cpp"
+#include "HttpException.h"
 #include "Json.h"
 #include "Response.h"
 #include "User.h"
