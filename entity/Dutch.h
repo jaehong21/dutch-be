@@ -42,16 +42,21 @@ class NormalDutch : public Dutch {
 
 class Ledger : public Entity {
   public:
-    Ledger(std::shared_ptr<Dutch> dutch, std::shared_ptr<User> user, int amount);
-    Ledger(std::shared_ptr<Dutch> dutch, std::shared_ptr<User> user, int amount, long sendTime);
+    Ledger(std::string dutchUuid, std::string userUuid, int amount);
+    Ledger(std::string uuid, std::string dutchUuid, std::string userUuid, int amount,
+           long sendTime);
     virtual ~Ledger() {}
 
-    void setSendTime();
+    static long getTimeNow();
+    std::string getUuid() const;
+    std::string getDutchUuid() const;
+    std::string getUserUuid() const;
     std::vector<std::string> toString() override;
 
   private:
-    std::shared_ptr<Dutch> dutch;
-    std::shared_ptr<User> user;
+    std::string uuid;
+    std::string dutchUuid;
+    std::string userUuid;
     int amount;
     long sendTime;
 };

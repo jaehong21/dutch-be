@@ -20,7 +20,7 @@ core/Response.o: core/Response.cpp core/Response.h
 	$(CC) $(CFLAGS) -c $< -o $@
 core/Json.o: core/Json.cpp core/Json.h
 	$(CC) $(CFLAGS) -c $< -o $@
-core/HttpException.o: core/HttpException.h
+core/HttpException.o: core/HttpException.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ 
 
 entity/Entity.o: entity/Entity.cpp entity/Entity.h
@@ -46,7 +46,7 @@ controller/AccountController.o: controller/AccountController.cpp controller/Acco
 controller/DutchController.o: controller/DutchController.cpp controller/DutchController.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-utils/Utils.o: utils/Utils.h
+utils/Utils.o: utils/Utils.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 main.o: main.cpp

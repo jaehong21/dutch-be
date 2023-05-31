@@ -6,7 +6,7 @@
 using std::string, std::vector, std::shared_ptr;
 
 void Account::setMoney(int balance) { this->balance = balance; }
-int Account::getMoney() const { return balance; }
+int Account::getBalance() const { return balance; }
 shared_ptr<User> Account::getOwner() const { return owner; }
 string Account::getUuid() const { return uuid; }
 
@@ -17,7 +17,7 @@ vector<string> UserAccount::toString() {
     vector<string> accountString;
     accountString.push_back(this->getUuid());
     accountString.push_back("user");
-    accountString.push_back(std::to_string(this->getMoney()));
+    accountString.push_back(std::to_string(this->getBalance()));
     return accountString;
 }
 
@@ -30,6 +30,6 @@ vector<string> DutchAccount::toString() {
     vector<string> accountString;
     accountString.push_back(this->getUuid());
     accountString.push_back("dutch");
-    accountString.push_back(std::to_string(this->getMoney()));
+    accountString.push_back(std::to_string(this->getBalance()));
     return accountString;
 }

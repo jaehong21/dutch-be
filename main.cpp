@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -10,7 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "HttpException.h"
+#include "HttpException.cpp"
 #include "Json.h"
 #include "Request.h"
 #include "Response.h"
@@ -58,7 +59,7 @@ int main() {
     shared_ptr<FileRepository> accountRepository = std::make_shared<FileRepository>("account.txt");
     // uuid, type, owner, targetBalance
     shared_ptr<FileRepository> dutchRepository = std::make_shared<FileRepository>("dutch.txt");
-    // dutch_uuid, user_uuid, amount, send_at
+    // uuid, dutch_uuid, user_uuid, amount, send_at
     shared_ptr<FileRepository> ledgerRepository = std::make_shared<FileRepository>("ledger.txt");
 
     shared_ptr<UserController> userController =
@@ -92,6 +93,9 @@ int main() {
     };
 
     // --- Init dutch handlers ---
+    handlers["GET/dutch/normal"] = [&dutchController](int sockfd, const Request &req) {
+        dutchController->findOneNormalDutch(sockfd, req);
+    };
     handlers["POST/dutch/normal"] = [&dutchController](int sockfd, const Request &req) {
         dutchController->createNormalDutch(sockfd, req);
     };

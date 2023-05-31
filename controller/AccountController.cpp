@@ -1,6 +1,6 @@
 #include "AccountController.h"
 #include "Account.h"
-#include "HttpException.h"
+#include "HttpException.cpp"
 #include "Json.h"
 #include "Response.h"
 #include "User.h"
@@ -45,11 +45,12 @@ void AccountController::updateUserAccount(int sockfd, const Request &request) {
         throw BadRequestException("User not found");
 
     auto newAccount = UserAccount(
-        make_shared<User>(userString[0], userString[1], userString[2], userString[3]), balance);
+        std::make_shared<User>(userString[0], userString[1], userString[2], userString[3]),
+        balance);
 
     this->accountRepository->update(query["uuid"], newAccount);
 
-    auto json = Json().add("uuid", newAccount.getUuid()).add("balance", newAccount.getMoney());
+    auto json = Json().add("uuid", newAccount.getUuid()).add("balance", newAccount.getBalance());
 
     Response response(201, json);
     response.execute(sockfd);

@@ -14,7 +14,7 @@ class Account : public Entity {
     std::shared_ptr<User> getOwner() const;
     std::string getUuid() const;
     void setMoney(int balance);
-    int getMoney() const;
+    int getBalance() const;
 
   private:
     std::string uuid;

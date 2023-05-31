@@ -1,4 +1,5 @@
 #include "Entity.h"
+#include <algorithm>
 #include <chrono>
 #include <random>
 #include <string>

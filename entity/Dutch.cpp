@@ -37,20 +37,26 @@ vector<string> NormalDutch::toString() {
     return dutchString;
 }
 
-Ledger::Ledger(shared_ptr<Dutch> dutch, shared_ptr<User> user, int amount)
-    : dutch(dutch), user(user), amount(amount), sendTime(-1) {}
-Ledger::Ledger(shared_ptr<Dutch> dutch, shared_ptr<User> user, int amount, long sendTime)
-    : dutch(dutch), user(user), amount(amount), sendTime(sendTime) {}
+Ledger::Ledger(string dutchUuid, string userUuid, int amount)
+    : uuid(Entity::generateUuidV4()), dutchUuid(dutchUuid), userUuid(userUuid), amount(amount),
+      sendTime(-1) {}
+Ledger::Ledger(string uuid, string dutchUuid, string userUuid, int amount, long sendTime)
+    : uuid(uuid), dutchUuid(dutchUuid), userUuid(userUuid), amount(amount), sendTime(sendTime) {}
 
-void Ledger::setSendTime() {
+long Ledger::getTimeNow() {
     std::time_t t = std::time(nullptr);
-    this->sendTime = static_cast<long>(t);
+    return static_cast<long>(t);
 }
+
+string Ledger::getUuid() const { return uuid; }
+string Ledger::getDutchUuid() const { return dutchUuid; }
+string Ledger::getUserUuid() const { return userUuid; }
 
 vector<string> Ledger::toString() {
     vector<string> ledgerString;
-    ledgerString.push_back(this->dutch->getUuid());
-    ledgerString.push_back(this->user->getUuid());
+    ledgerString.push_back(this->getUuid());
+    ledgerString.push_back(this->getDutchUuid());
+    ledgerString.push_back(this->getUserUuid());
     ledgerString.push_back(std::to_string(this->amount));
     ledgerString.push_back(std::to_string(this->sendTime));
     return ledgerString;
