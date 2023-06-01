@@ -91,6 +91,9 @@ int main() {
     };
 
     // --- Init account handlers ---
+    handlers["GET/account/user"] = [&accountController](int sockfd, const Request &req) {
+        accountController->findOneUserAccount(sockfd, req);
+    };
     handlers["PATCH/account/user"] = [&accountController](int sockfd, const Request &req) {
         accountController->updateUserAccount(sockfd, req);
     };

@@ -25,6 +25,26 @@ AccountController::getInstance(shared_ptr<Repository> userRepository,
     return instance;
 }
 
+void AccountController::findOneUserAccount(int sockfd, const Request &request) {
+    map<string, string> query = request.getQueryString();
+    validQueryString(request, {"uuid"});
+
+    // uuid, type, balance
+    vector<string> accountString = this->accountRepository->find(query["uuid"]);
+    if (accountString.size() < 3)
+        throw BadRequestException("Account not found");
+    if (accountString[1] != "user")
+        throw BadRequestException("Account is not user account");
+
+    auto json = Json()
+                    .add("uuid", accountString[0])
+                    .add("type", accountString[1])
+                    .add("balance", accountString[2]);
+
+    auto response = Response(200, json);
+    response.execute(sockfd);
+}
+
 void AccountController::updateUserAccount(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"uuid", "balance"});
@@ -52,6 +72,6 @@ void AccountController::updateUserAccount(int sockfd, const Request &request) {
 
     auto json = Json().add("uuid", newAccount.getUuid()).add("balance", newAccount.getBalance());
 
-    Response response(201, json);
+    auto response = Response(201, json);
     response.execute(sockfd);
 }

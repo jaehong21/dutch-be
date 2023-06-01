@@ -11,6 +11,7 @@ class AccountController : public Controller {
                 std::shared_ptr<Repository> accountRepository);
     virtual ~AccountController() {}
 
+    void findOneUserAccount(int sockfd, const Request &request);
     void updateUserAccount(int sockfd, const Request &request);
 
   private:
