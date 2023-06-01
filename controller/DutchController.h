@@ -16,6 +16,7 @@ class DutchController : public Controller {
     virtual ~DutchController() {}
 
     void findOneNormalDutch(int sockfd, const Request &request);
+    void findAllNormalDutch(int sockfd, const Request &request);
     void createNormalDutch(int sockfd, const Request &request);
     void payNormalDutch(int sockfd, const Request &request);
 

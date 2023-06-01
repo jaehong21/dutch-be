@@ -96,6 +96,9 @@ int main() {
     handlers["GET/dutch/normal"] = [&dutchController](int sockfd, const Request &req) {
         dutchController->findOneNormalDutch(sockfd, req);
     };
+    handlers["GET/dutch/normal/user"] = [&dutchController](int sockfd, const Request &req) {
+        dutchController->findAllNormalDutch(sockfd, req);
+    };
     handlers["POST/dutch/normal"] = [&dutchController](int sockfd, const Request &req) {
         dutchController->createNormalDutch(sockfd, req);
     };
@@ -119,7 +122,7 @@ int main() {
             continue;
         }
         string request(buffer, num_bytes);
-        const Request req(request);
+        auto req = Request(request);
 
         string key = req.getMethod() + req.getPath();
         try {

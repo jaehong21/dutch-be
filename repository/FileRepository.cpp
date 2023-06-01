@@ -11,7 +11,13 @@
 
 using std::string, std::vector;
 
-FileRepository::FileRepository(string fileName) : tableName(fileName) {}
+FileRepository::FileRepository(string fileName) : tableName(fileName) {
+    std::ifstream file(fileName);
+    if (!file.good()) {
+        std::ofstream newFile(fileName);
+        newFile.close();
+    }
+}
 
 void FileRepository::create(Entity &entity) {
     std::lock_guard<std::mutex> guard(this->mtx);

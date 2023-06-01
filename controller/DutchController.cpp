@@ -27,10 +27,10 @@ shared_ptr<DutchController> DutchController::getInstance(shared_ptr<Repository> 
 
 void DutchController::findOneNormalDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
-    validQueryString(request, {"uuid"});
+    validQueryString(request, {"dutch_uuid"});
 
     // uuid, type, owner, targetBalance
-    vector<string> dutchString = this->dutchRepository->find(query["uuid"]);
+    vector<string> dutchString = this->dutchRepository->find(query["dutch_uuid"]);
     if (dutchString.size() < 4)
         throw BadRequestException("Dutch not found");
     if (dutchString[1] != "normal")
@@ -40,6 +40,10 @@ void DutchController::findOneNormalDutch(int sockfd, const Request &request) {
     vector<vector<string>> ledgerStringList = this->ledgerRepository->findAll();
     vector<string> userUuidList, sendUserUuidList;
     for (auto const &ledgerString : ledgerStringList) {
+        // if ledger is not related to this dutch
+        if (ledgerString[1] != dutchString[0])
+            continue;
+
         userUuidList.push_back(ledgerString[2]);
         if (stoi(ledgerString[4]) > 0) { // send_at > 0 means the user has paid
             sendUserUuidList.push_back(ledgerString[2]);
@@ -51,13 +55,45 @@ void DutchController::findOneNormalDutch(int sockfd, const Request &request) {
                                                this->getUserList(userUuidList),
                                                this->getUserList(sendUserUuidList));
 
+    // uuid, type, balance
+    vector<string> dutchAccountString = this->accountRepository->find(dutchString[0]);
+
     auto json = Json()
                     .add("dutch_uuid", dutch->getUuid())
                     .add("type", dutchString[1])
                     .add("owner", dutch->getOwner()->getUuid())
+                    .add("current_balance", dutchAccountString[2])
                     .add("target_balance", dutch->getTargetBalance())
                     .add("user_list", userUuidList)
                     .add("send_user_list", sendUserUuidList);
+
+    auto response = Response(200, json);
+    response.execute(sockfd);
+}
+
+void DutchController::findAllNormalDutch(int sockfd, const Request &request) {
+    map<string, string> query = request.getQueryString();
+    validQueryString(request, {"user_uuid"});
+
+    vector<string> dutchOwnerUuidList, dutchTargetUuidList;
+
+    // uuid, type, owner, targetBalance
+    vector<vector<string>> dutchStringList = this->dutchRepository->findAll();
+    for (auto const &dutchString : dutchStringList) {
+        if (dutchString[2] == query["user_uuid"])
+            dutchOwnerUuidList.push_back(dutchString[0]);
+    }
+
+    // uuid, dutch_uuid, user_uuid, amount, send_at
+    vector<vector<string>> ledgerStringList = this->ledgerRepository->findAll();
+    for (auto const &ledgerString : ledgerStringList) {
+        if (ledgerString[2] == query["user_uuid"])
+            dutchTargetUuidList.push_back(ledgerString[1]);
+    }
+
+    auto json = Json()
+                    .add("dutch_owner_list", dutchOwnerUuidList)
+                    .add("dutch_target_list", dutchTargetUuidList);
 
     auto response = Response(200, json);
     response.execute(sockfd);
@@ -78,6 +114,9 @@ void DutchController::createNormalDutch(int sockfd, const Request &request) {
     if (userUuidList.size() < 1)
         throw BadRequestException("User list must have at least 1 users");
 
+    if (targetBalance % userUuidList.size() != 0)
+        throw BadRequestException("Target balance must be divided completely");
+
     auto owner = this->getUser(query["owner"]);
     auto userList = this->getUserList(userUuidList);
     auto newDutch = NormalDutch(targetBalance, owner, userList);
@@ -86,7 +125,6 @@ void DutchController::createNormalDutch(int sockfd, const Request &request) {
     auto dutchAccount = DutchAccount(std::make_shared<NormalDutch>(newDutch), owner, 0);
     this->accountRepository->create(dutchAccount);
 
-    // TODO: when it is not divided completely
     int eachBalance = targetBalance / userList.size();
     for (auto user : userList) {
         auto newLedger = Ledger(newDutch.getUuid(), user->getUuid(), eachBalance);
