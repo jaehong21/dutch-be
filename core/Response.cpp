@@ -13,8 +13,8 @@ Response::Response(int statusCode, Json body) : statusCode(statusCode), body(bod
 string Response::getResponse() const {
     string response = "HTTP/1.1 " + std::to_string(statusCode) + " " +
                       getStatusMessage(statusCode) + "\r\n" + "Content-Type: " + contentType +
-                      "\r\n" + "Content-Length: " + std::to_string(body.length()) + "\r\n" +
-                      "\r\n" + body;
+                      "\r\n" + "Access-Control-Allow-Origin: *\r\n" +
+                      "Content-Length: " + std::to_string(body.length()) + "\r\n" + "\r\n" + body;
 
     return response;
 }
