@@ -77,6 +77,9 @@ int main() {
     handlers["POST/user"] = [&userController](int sockfd, const Request &req) {
         userController->createUser(sockfd, req);
     };
+    handlers["POST/user/login"] = [&userController](int sockfd, const Request &req) {
+        userController->loginUser(sockfd, req);
+    };
     handlers["PATCH/user"] = [&userController](int sockfd, const Request &req) {
         userController->updateUser(sockfd, req);
     };

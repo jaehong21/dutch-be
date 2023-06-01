@@ -25,11 +25,38 @@ shared_ptr<UserController> UserController::getInstance(shared_ptr<Repository> us
     return instance;
 }
 
+void UserController::loginUser(int sockfd, const Request &request) {
+    map<string, string> queryString = request.getQueryString();
+    validQueryString(request, {"username", "password"});
+
+    // uuid, username, password, email
+    vector<vector<string>> userStringList = this->userRepository->findAll();
+    bool found = false;
+    for (auto userString : userStringList) {
+        if (userString[1] == queryString["username"]) {
+            found = true;
+            if (userString[2] == queryString["password"]) {
+                auto json = Json()
+                                .add("uuid", userString[0])
+                                .add("username", userString[1])
+                                .add("email", userString[3]);
+                auto response = Response(201, json);
+                response.execute(sockfd);
+                return;
+            } else {
+                throw UnauthorizedException("Wrong password");
+            }
+        }
+    }
+
+    throw BadRequestException("User not found");
+}
+
 void UserController::createUser(int sockfd, const Request &request) {
     map<string, string> queryString = request.getQueryString();
     validQueryString(request, {"username", "password", "email"});
 
-    User user(queryString["username"], queryString["password"], queryString["email"]);
+    auto user = User(queryString["username"], queryString["password"], queryString["email"]);
     this->userRepository->create(user);
 
     auto account = UserAccount(std::make_shared<User>(user), INITIAL_BALANCE);
@@ -62,7 +89,7 @@ void UserController::updateUser(int sockfd, const Request &request) {
                     .add("username", newUser.getUsername())
                     .add("email", newUser.getEmail());
 
-    Response response(201, json);
+    auto response = Response(201, json);
     response.execute(sockfd);
 }
 
@@ -81,7 +108,7 @@ void UserController::findOneUser(int sockfd, const Request &request) {
                     .add("username", user.getUsername())
                     .add("email", user.getEmail());
 
-    Response response(200, json);
+    auto response = Response(200, json);
     response.execute(sockfd);
 }
 
@@ -94,6 +121,6 @@ void UserController::findAllUser(int sockfd, const Request &request) {
 
     auto json = Json().add("user_list", userList);
 
-    Response response(200, json);
+    auto response = Response(200, json);
     response.execute(sockfd);
 }

@@ -11,6 +11,7 @@ class UserController : public Controller {
                 std::shared_ptr<Repository> accountRepository);
     virtual ~UserController() {}
 
+    void loginUser(int sockfd, const Request &request);
     void createUser(int sockfd, const Request &request);
     void updateUser(int sockfd, const Request &request);
     void findOneUser(int sockfd, const Request &request);
