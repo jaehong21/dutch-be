@@ -19,6 +19,7 @@ class DutchController : public Controller {
     void findAllNormalDutch(int sockfd, const Request &request);
     void createNormalDutch(int sockfd, const Request &request);
     void payNormalDutch(int sockfd, const Request &request);
+    void doneNormalDutch(int sockfd, const Request &request);
 
   private:
     static std::shared_ptr<DutchController> instance;

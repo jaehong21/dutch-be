@@ -111,6 +111,9 @@ int main() {
     handlers["POST/dutch/normal/pay"] = [&dutchController](int sockfd, const Request &req) {
         dutchController->payNormalDutch(sockfd, req);
     };
+    handlers["POST/dutch/normal/done"] = [&dutchController](int sockfd, const Request &req) {
+        dutchController->doneNormalDutch(sockfd, req);
+    };
 
     // --- Start listening for connections ---
     while (true) {
