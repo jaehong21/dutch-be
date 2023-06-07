@@ -214,9 +214,8 @@ void DutchController::doneNormalDutch(int sockfd, const Request &request) {
     vector<string> dutchString = this->dutchRepository->find(query["dutch_uuid"]);
     if (dutchString.size() < 4)
         throw BadRequestException("Dutch not found");
-    if query
-        ["user_uuid"] != dutchString[2] throw BadRequestException(
-                             "user must be the owner of the dutch to retrieve the dutch");
+    if (query["user_uuid"] != dutchString[2])
+        throw BadRequestException("user must be the owner of the dutch to retrieve the dutch");
     auto owner = this->getUser(query["user_uuid"]);
 
     // uuid, dutch_uuid, user_uuid, amount, send_at
@@ -242,8 +241,8 @@ void DutchController::doneNormalDutch(int sockfd, const Request &request) {
     // uuid, type, balance
     vector<string> dutchAccountString = this->accountRepository->find(dutch->getUuid());
     vector<string> ownerAccountString = this->accountRepository->find(owner->getUuid());
-    auto newDutchAccount = DutchAccount(dutch, owner, dutchAccountString[2] - sum);
-    auto newOwnerAccount = UserAccount(owner, ownerAccountString[2] + sum);
+    auto newDutchAccount = DutchAccount(dutch, owner, stoi(dutchAccountString[2]) - sum);
+    auto newOwnerAccount = UserAccount(owner, stoi(ownerAccountString[2]) + sum);
 
     this->accountRepository->update(newDutchAccount.getUuid(), newDutchAccount);
     this->accountRepository->update(newOwnerAccount.getUuid(), newOwnerAccount);
