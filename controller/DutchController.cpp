@@ -170,8 +170,13 @@ void DutchController::payNormalDutch(int sockfd, const Request &request) {
             // set sendAmount to ledger amount
             sendAmount = stoi(ledgerString[3]);
             payerLedgerUuid = ledgerString[0];
+            if (stoi(ledgerString[4]) > 0)
+                throw BadRequestException("User has paid");
         }
     }
+
+    if (sendUserUuidList.size() >= userUuidList.size())
+        throw BadRequestException("All users have paid");
 
     auto dutch = std::make_shared<NormalDutch>(dutchString[0], stoi(dutchString[3]), owner,
                                                this->getUserList(userUuidList),

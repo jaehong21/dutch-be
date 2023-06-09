@@ -19,6 +19,12 @@ bool Controller::validQueryString(const Request &request, vector<string> keys) c
             valid = false;
             throw BadRequestException("Missing query string key: " + key);
             break;
+        } else {
+            if (queryString[key] == "") {
+                valid = false;
+                throw BadRequestException("Empty query string key: " + key);
+                break;
+            }
         }
     }
 
