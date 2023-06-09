@@ -58,14 +58,27 @@ void DutchController::findOneNormalDutch(int sockfd, const Request &request) {
     // uuid, type, balance
     vector<string> dutchAccountString = this->accountRepository->find(dutchString[0]);
 
+    vector<string> userNameList, sendUserNameList;
+    for (auto const &uuid : userUuidList) {
+        auto user = this->getUser(uuid);
+        userNameList.push_back(user->getUsername());
+    }
+    for (auto const &uuid : sendUserUuidList) {
+        auto user = this->getUser(uuid);
+        sendUserNameList.push_back(user->getUsername());
+    }
+
     auto json = Json()
                     .add("dutch_uuid", dutch->getUuid())
                     .add("type", dutchString[1])
                     .add("owner", dutch->getOwner()->getUuid())
+                    .add("owner_name", dutch->getOwner()->getUsername())
                     .add("current_balance", dutchAccountString[2])
                     .add("target_balance", dutch->getTargetBalance())
                     .add("user_list", userUuidList)
-                    .add("send_user_list", sendUserUuidList);
+                    .add("user_name_list", userNameList)
+                    .add("send_user_list", sendUserUuidList)
+                    .add("send_user_name_list", sendUserNameList);
 
     auto response = Response(200, json);
     response.execute(sockfd);
