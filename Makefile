@@ -4,7 +4,8 @@ CFLAGS += -Icore -Ientity -Irepository -Icontroller -Iutils
 OBJ = core/Request.o core/Response.o core/Json.o core/HttpException.o
 OBJ += entity/Entity.o entity/User.o entity/Account.o entity/Dutch.o
 OBJ += repository/Repository.o repository/FileRepository.o 
-OBJ += controller/Controller.o controller/UserController.o controller/AccountController.o controller/NormalDutchController.o
+OBJ += controller/Controller.o controller/UserController.o controller/AccountController.o 
+OBJ += controller/NormalDutchController.o controller/RaceDutchController.o
 OBJ += utils/Utils.o
 OBJ += main.o
 TARGET = a.out
@@ -44,6 +45,8 @@ controller/UserController.o: controller/UserController.cpp controller/UserContro
 controller/AccountController.o: controller/AccountController.cpp controller/AccountController.h
 	$(CC) $(CFLAGS) -c $< -o $@
 controller/NormalDutchController.o: controller/NormalDutchController.cpp controller/NormalDutchController.h
+	$(CC) $(CFLAGS) -c $< -o $@
+controller/RaceDutchController.o: controller/RaceDutchController.cpp controller/RaceDutchController.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 utils/Utils.o: utils/Utils.cpp utils/Utils.h
