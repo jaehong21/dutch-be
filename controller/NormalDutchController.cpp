@@ -1,4 +1,4 @@
-#include "DutchController.h"
+#include "NormalDutchController.h"
 #include "Account.h"
 #include "Dutch.h"
 #include "HttpException.h"
@@ -9,14 +9,13 @@
 
 using std::string, std::vector, std::map, std::shared_ptr;
 
-shared_ptr<DutchController> DutchController::instance = nullptr;
+shared_ptr<NormalDutchController> NormalDutchController::instance = nullptr;
 
-shared_ptr<DutchController> DutchController::getInstance(shared_ptr<Repository> userRepository,
-                                                         shared_ptr<Repository> accountRepository,
-                                                         shared_ptr<Repository> dutchRepository,
-                                                         shared_ptr<Repository> ledgerRepository) {
+shared_ptr<NormalDutchController> NormalDutchController::getInstance(
+    shared_ptr<Repository> userRepository, shared_ptr<Repository> accountRepository,
+    shared_ptr<Repository> dutchRepository, shared_ptr<Repository> ledgerRepository) {
     if (instance.get() == nullptr) {
-        instance = std::make_shared<DutchController>(DutchController());
+        instance = std::make_shared<NormalDutchController>(NormalDutchController());
         instance->userRepository = userRepository;
         instance->accountRepository = accountRepository;
         instance->dutchRepository = dutchRepository;
@@ -25,7 +24,7 @@ shared_ptr<DutchController> DutchController::getInstance(shared_ptr<Repository> 
     return instance;
 }
 
-void DutchController::findOneNormalDutch(int sockfd, const Request &request) {
+void NormalDutchController::findOneNormalDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"dutch_uuid"});
 
@@ -84,7 +83,7 @@ void DutchController::findOneNormalDutch(int sockfd, const Request &request) {
     response.execute(sockfd);
 }
 
-void DutchController::findAllNormalDutch(int sockfd, const Request &request) {
+void NormalDutchController::findAllNormalDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"user_uuid"});
 
@@ -112,7 +111,7 @@ void DutchController::findAllNormalDutch(int sockfd, const Request &request) {
     response.execute(sockfd);
 }
 
-void DutchController::createNormalDutch(int sockfd, const Request &request) {
+void NormalDutchController::createNormalDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"owner", "target_balance", "user_list"});
 
@@ -155,7 +154,7 @@ void DutchController::createNormalDutch(int sockfd, const Request &request) {
     response.execute(sockfd);
 }
 
-void DutchController::payNormalDutch(int sockfd, const Request &request) {
+void NormalDutchController::payNormalDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"dutch_uuid", "user_uuid"});
 
@@ -224,7 +223,7 @@ void DutchController::payNormalDutch(int sockfd, const Request &request) {
     response.execute(sockfd);
 }
 
-void DutchController::doneNormalDutch(int sockfd, const Request &request) {
+void NormalDutchController::doneNormalDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"dutch_uuid", "user_uuid"});
 
@@ -278,7 +277,7 @@ void DutchController::doneNormalDutch(int sockfd, const Request &request) {
     response.execute(sockfd);
 }
 
-shared_ptr<User> DutchController::getUser(const string &uuid) {
+shared_ptr<User> NormalDutchController::getUser(const string &uuid) {
     vector<string> userString = this->userRepository->find(uuid);
     if (userString.size() < 4)
         throw BadRequestException("User not found");
@@ -287,7 +286,7 @@ shared_ptr<User> DutchController::getUser(const string &uuid) {
     return user;
 }
 
-vector<shared_ptr<User>> DutchController::getUserList(const vector<string> &uuidList) {
+vector<shared_ptr<User>> NormalDutchController::getUserList(const vector<string> &uuidList) {
     vector<shared_ptr<User>> userList;
     for (const string &uuid : uuidList) {
         auto user = this->getUser(uuid);

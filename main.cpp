@@ -17,8 +17,8 @@
 #include "Response.h"
 
 #include "AccountController.h"
-#include "DutchController.h"
 #include "FileRepository.h"
+#include "NormalDutchController.h"
 #include "UserController.h"
 
 using std::string, std::vector, std::map, std::shared_ptr;
@@ -66,7 +66,7 @@ int main() {
         UserController::getInstance(userRepository, accountRepository);
     shared_ptr<AccountController> accountController =
         AccountController::getInstance(userRepository, accountRepository);
-    shared_ptr<DutchController> dutchController = DutchController::getInstance(
+    shared_ptr<NormalDutchController> normalDutchController = NormalDutchController::getInstance(
         userRepository, accountRepository, dutchRepository, ledgerRepository);
 
     // --- Init request handlers ---
@@ -99,20 +99,20 @@ int main() {
     };
 
     // --- Init dutch handlers ---
-    handlers["GET/dutch/normal"] = [&dutchController](int sockfd, const Request &req) {
-        dutchController->findOneNormalDutch(sockfd, req);
+    handlers["GET/dutch/normal"] = [&normalDutchController](int sockfd, const Request &req) {
+        normalDutchController->findOneNormalDutch(sockfd, req);
     };
-    handlers["GET/dutch/normal/user"] = [&dutchController](int sockfd, const Request &req) {
-        dutchController->findAllNormalDutch(sockfd, req);
+    handlers["GET/dutch/normal/user"] = [&normalDutchController](int sockfd, const Request &req) {
+        normalDutchController->findAllNormalDutch(sockfd, req);
     };
-    handlers["POST/dutch/normal"] = [&dutchController](int sockfd, const Request &req) {
-        dutchController->createNormalDutch(sockfd, req);
+    handlers["POST/dutch/normal"] = [&normalDutchController](int sockfd, const Request &req) {
+        normalDutchController->createNormalDutch(sockfd, req);
     };
-    handlers["POST/dutch/normal/pay"] = [&dutchController](int sockfd, const Request &req) {
-        dutchController->payNormalDutch(sockfd, req);
+    handlers["POST/dutch/normal/pay"] = [&normalDutchController](int sockfd, const Request &req) {
+        normalDutchController->payNormalDutch(sockfd, req);
     };
-    handlers["POST/dutch/normal/done"] = [&dutchController](int sockfd, const Request &req) {
-        dutchController->doneNormalDutch(sockfd, req);
+    handlers["POST/dutch/normal/done"] = [&normalDutchController](int sockfd, const Request &req) {
+        normalDutchController->doneNormalDutch(sockfd, req);
     };
 
     // --- Start listening for connections ---

@@ -8,12 +8,12 @@
 #include <string>
 #include <vector>
 
-class DutchController : public Controller {
+class NormalDutchController : public Controller {
   public:
-    static std::shared_ptr<DutchController> getInstance(
+    static std::shared_ptr<NormalDutchController> getInstance(
         std::shared_ptr<Repository> userRepository, std::shared_ptr<Repository> accountRepository,
         std::shared_ptr<Repository> dutchRepository, std::shared_ptr<Repository> ledgerRepository);
-    virtual ~DutchController() {}
+    virtual ~NormalDutchController() {}
 
     void findOneNormalDutch(int sockfd, const Request &request);
     void findAllNormalDutch(int sockfd, const Request &request);
@@ -22,8 +22,8 @@ class DutchController : public Controller {
     void doneNormalDutch(int sockfd, const Request &request);
 
   private:
-    static std::shared_ptr<DutchController> instance;
-    DutchController() {}
+    static std::shared_ptr<NormalDutchController> instance;
+    NormalDutchController() {}
 
     std::shared_ptr<User> getUser(const std::string &uuid);
     std::vector<std::shared_ptr<User>> getUserList(const std::vector<std::string> &uuidList);
