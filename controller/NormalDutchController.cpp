@@ -162,6 +162,8 @@ void NormalDutchController::payNormalDutch(int sockfd, const Request &request) {
     vector<string> dutchString = this->dutchRepository->find(query["dutch_uuid"]);
     if (dutchString.size() < 4)
         throw BadRequestException("Dutch not found");
+    if (dutchString[1] != "normal")
+        throw BadRequestException("Dutch is not normal");
 
     auto payer = this->getUser(query["user_uuid"]);
     auto owner = this->getUser(dutchString[2]);
@@ -169,21 +171,26 @@ void NormalDutchController::payNormalDutch(int sockfd, const Request &request) {
     // uuid, dutch_uuid, user_uuid, amount, send_at
     vector<vector<string>> ledgerStringList = this->ledgerRepository->findAll();
     vector<string> userUuidList, sendUserUuidList;
-    int sendAmount;
     string payerLedgerUuid;
+    int sendAmount;
+
     for (auto const &ledgerString : ledgerStringList) {
-        userUuidList.push_back(ledgerString[2]);
-        // send_at > 0 means the user has paid
-        if (stoi(ledgerString[4]) > 0) {
-            sendUserUuidList.push_back(ledgerString[2]);
-        }
-        // find the ledger of payer
-        if (ledgerString[2] == payer->getUuid()) {
-            // set sendAmount to ledger amount
-            sendAmount = stoi(ledgerString[3]);
-            payerLedgerUuid = ledgerString[0];
-            if (stoi(ledgerString[4]) > 0)
-                throw BadRequestException("User has paid");
+        // find all ledgers with dutch
+        if (ledgerString[1] == dutchString[0]) {
+            // add user to userUuidList
+            userUuidList.push_back(ledgerString[2]);
+            // send_at > 0 means the user has paid
+            if (stoi(ledgerString[4]) > 0) {
+                sendUserUuidList.push_back(ledgerString[2]);
+            }
+            // find the ledger of payer
+            if (ledgerString[2] == payer->getUuid()) {
+                // set sendAmount to ledger amount
+                sendAmount = stoi(ledgerString[3]);
+                payerLedgerUuid = ledgerString[0];
+                if (stoi(ledgerString[4]) > 0)
+                    throw BadRequestException("User has paid");
+            }
         }
     }
 
