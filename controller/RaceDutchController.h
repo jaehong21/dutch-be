@@ -15,7 +15,9 @@ class RaceDutchController : public Controller {
         std::shared_ptr<Repository> dutchRepository, std::shared_ptr<Repository> ledgerRepository);
     virtual ~RaceDutchController() {}
 
-    void findOneRaceDutch(int sockfd, const Request &request);
+    void createRaceDutch(int sockfd, const Request &request);
+    void payRaceDutch(int sockfd, const Request &request);
+    // void doneRaceDutch(int sockfd, const Request &request);
 
   private:
     static std::shared_ptr<RaceDutchController> instance;

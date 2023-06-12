@@ -37,6 +37,22 @@ vector<string> NormalDutch::toString() {
     return dutchString;
 }
 
+RaceDutch::RaceDutch(int targetBalance, shared_ptr<User> owner, vector<shared_ptr<User>> userList)
+    : Dutch(targetBalance, owner, userList) {}
+RaceDutch::RaceDutch(string uuid, int targetBalance, shared_ptr<User> owner,
+                     vector<shared_ptr<User>> userList, vector<shared_ptr<User>> sendUserList)
+    : Dutch(uuid, targetBalance, owner, userList, sendUserList) {}
+
+vector<string> RaceDutch::toString() {
+    vector<string> dutchString;
+    dutchString.push_back(this->getUuid());
+    dutchString.push_back("race");
+    dutchString.push_back(this->getOwner()->getUuid());
+    dutchString.push_back(std::to_string(this->getTargetBalance()));
+
+    return dutchString;
+}
+
 Ledger::Ledger(string dutchUuid, string userUuid, int amount)
     : uuid(Entity::generateUuidV4()), dutchUuid(dutchUuid), userUuid(userUuid), amount(amount),
       sendTime(-1) {}

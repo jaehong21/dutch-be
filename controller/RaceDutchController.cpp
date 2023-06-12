@@ -24,62 +24,122 @@ shared_ptr<RaceDutchController> RaceDutchController::getInstance(
     return instance;
 }
 
-void RaceDutchController::findOneRaceDutch(int sockfd, const Request &request) {
+void RaceDutchController::createRaceDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
-    validQueryString(request, {"dutch_uuid"});
+    validQueryString(request, {"owner", "target_balance", "user_list"});
+
+    int targetBalance;
+    try {
+        targetBalance = stoi(query["target_balance"]);
+    } catch (const std::exception &e) {
+        throw BadRequestException("Target balance must be integer");
+    }
+
+    vector<string> userUuidList = Utils::splitStringBySeparator(query["user_list"], ",");
+    if (userUuidList.size() < 1)
+        throw BadRequestException("User list must have at least 1 users");
+
+    if (targetBalance % userUuidList.size() != 0)
+        throw BadRequestException("Target balance must be divided completely");
+
+    auto owner = this->getUser(query["owner"]);
+    auto userList = this->getUserList(userUuidList);
+    auto newDutch = RaceDutch(targetBalance, owner, userList);
+    this->dutchRepository->create(newDutch);
+
+    auto dutchAccount = DutchAccount(std::make_shared<RaceDutch>(newDutch), owner, 0);
+    this->accountRepository->create(dutchAccount);
+
+    int eachBalance = targetBalance / userList.size();
+    for (auto user : userList) {
+        auto newLedger = Ledger(newDutch.getUuid(), user->getUuid(), eachBalance);
+        this->ledgerRepository->create(newLedger);
+    }
+
+    auto json = Json()
+                    .add("dutch_uuid", newDutch.getUuid())
+                    .add("type", "normal")
+                    .add("owner", newDutch.getOwner()->getUuid())
+                    .add("target_balance", newDutch.getTargetBalance())
+                    .add("user_list", userUuidList);
+
+    auto response = Response(201, json);
+    response.execute(sockfd);
+}
+
+void RaceDutchController::payRaceDutch(int sockfd, const Request &request) {
+    map<string, string> query = request.getQueryString();
+    validQueryString(request, {"dutch_uuid", "user_uuid"});
 
     // uuid, type, owner, targetBalance
     vector<string> dutchString = this->dutchRepository->find(query["dutch_uuid"]);
     if (dutchString.size() < 4)
         throw BadRequestException("Dutch not found");
     if (dutchString[1] != "race")
-        throw BadRequestException("Dutch is not normal");
+        throw BadRequestException("Dutch is not race");
+
+    auto payer = this->getUser(query["user_uuid"]);
+    auto owner = this->getUser(dutchString[2]);
 
     // uuid, dutch_uuid, user_uuid, amount, send_at
     vector<vector<string>> ledgerStringList = this->ledgerRepository->findAll();
     vector<string> userUuidList, sendUserUuidList;
-    for (auto const &ledgerString : ledgerStringList) {
-        // if ledger is not related to this dutch
-        if (ledgerString[1] != dutchString[0])
-            continue;
+    string payerLedgerUuid;
+    int sendAmount;
 
-        userUuidList.push_back(ledgerString[2]);
-        if (stoi(ledgerString[4]) > 0) { // send_at > 0 means the user has paid
-            sendUserUuidList.push_back(ledgerString[2]);
+    for (auto const &ledgerString : ledgerStringList) {
+        // find all ledgers with dutch
+        if (ledgerString[1] == dutchString[0]) {
+            // add user to userUuidList
+            userUuidList.push_back(ledgerString[2]);
+            // send_at > 0 means the user has paid
+            if (stoi(ledgerString[4]) > 0) {
+                sendUserUuidList.push_back(ledgerString[2]);
+            }
+            // find the ledger of payer
+            if (ledgerString[2] == payer->getUuid()) {
+                // set sendAmount to ledger amount
+                sendAmount = stoi(ledgerString[3]);
+                payerLedgerUuid = ledgerString[0];
+                if (stoi(ledgerString[4]) > 0)
+                    throw BadRequestException("User has paid");
+            }
         }
     }
 
-    auto owner = this->getUser(dutchString[2]);
-    auto dutch = std::make_shared<NormalDutch>(dutchString[0], stoi(dutchString[3]), owner,
-                                               this->getUserList(userUuidList),
-                                               this->getUserList(sendUserUuidList));
+    if (sendUserUuidList.size() >= userUuidList.size())
+        throw BadRequestException("All users have paid");
+
+    auto dutch = std::make_shared<RaceDutch>(dutchString[0], stoi(dutchString[3]), owner,
+                                             this->getUserList(userUuidList),
+                                             this->getUserList(sendUserUuidList));
+    auto newLedger = Ledger(payerLedgerUuid, dutch->getUuid(), payer->getUuid(), sendAmount,
+                            Ledger::getTimeNow());
 
     // uuid, type, balance
-    vector<string> dutchAccountString = this->accountRepository->find(dutchString[0]);
+    vector<string> dutchAccountString = this->accountRepository->find(dutch->getUuid());
+    vector<string> payerAccountString = this->accountRepository->find(payer->getUuid());
+    auto newDutchAccount = DutchAccount(dutch, owner, stoi(dutchAccountString[2]) + sendAmount);
+    auto newPayerAccount = UserAccount(payer, stoi(payerAccountString[2]) - sendAmount);
 
-    vector<string> userNameList, sendUserNameList;
-    for (auto const &uuid : userUuidList) {
-        auto user = this->getUser(uuid);
-        userNameList.push_back(user->getUsername());
-    }
-    for (auto const &uuid : sendUserUuidList) {
-        auto user = this->getUser(uuid);
-        sendUserNameList.push_back(user->getUsername());
-    }
+    if (stoi(payerAccountString[2]) - sendAmount < 0)
+        throw BadRequestException("Not enough balance");
 
+    // update account
+    this->accountRepository->update(dutchAccountString[0], newDutchAccount);
+    this->accountRepository->update(payerAccountString[0], newPayerAccount);
+    // update ledger
+    this->ledgerRepository->update(newLedger.getUuid(), newLedger);
+
+    sendUserUuidList.push_back(payer->getUuid());
     auto json = Json()
                     .add("dutch_uuid", dutch->getUuid())
-                    .add("type", dutchString[1])
-                    .add("owner", dutch->getOwner()->getUuid())
-                    .add("owner_name", dutch->getOwner()->getUsername())
-                    .add("current_balance", dutchAccountString[2])
                     .add("target_balance", dutch->getTargetBalance())
+                    .add("current_balance", newDutchAccount.getBalance())
                     .add("user_list", userUuidList)
-                    .add("user_name_list", userNameList)
-                    .add("send_user_list", sendUserUuidList)
-                    .add("send_user_name_list", sendUserNameList);
+                    .add("send_user_list", sendUserUuidList);
 
-    auto response = Response(200, json);
+    auto response = Response(201, json);
     response.execute(sockfd);
 }
 

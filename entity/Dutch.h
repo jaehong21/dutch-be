@@ -40,6 +40,18 @@ class NormalDutch : public Dutch {
     std::vector<std::string> toString() override;
 };
 
+class RaceDutch : public Dutch {
+  public:
+    RaceDutch(int targetBalance, std::shared_ptr<User> owner,
+              std::vector<std::shared_ptr<User>> userList);
+    RaceDutch(std::string uuid, int targetBalance, std::shared_ptr<User> owner,
+              std::vector<std::shared_ptr<User>> userList,
+              std::vector<std::shared_ptr<User>> sendUserList);
+    virtual ~RaceDutch() {}
+
+    std::vector<std::string> toString() override;
+}
+
 class Ledger : public Entity {
   public:
     Ledger(std::string dutchUuid, std::string userUuid, int amount);

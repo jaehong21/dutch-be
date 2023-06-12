@@ -19,6 +19,7 @@
 #include "AccountController.h"
 #include "FileRepository.h"
 #include "NormalDutchController.h"
+#include "RaceDutchController.h"
 #include "UserController.h"
 
 using std::string, std::vector, std::map, std::shared_ptr;
@@ -68,6 +69,8 @@ int main() {
         AccountController::getInstance(userRepository, accountRepository);
     shared_ptr<NormalDutchController> normalDutchController = NormalDutchController::getInstance(
         userRepository, accountRepository, dutchRepository, ledgerRepository);
+    shared_ptr<RaceDutchController> raceDutchController = RaceDutchController::getInstance(
+        userRepository, accountRepository, dutchRepository, ledgerRepository);
 
     // --- Init request handlers ---
     using RequestHandler = std::function<void(int, const Request &)>;
@@ -98,12 +101,12 @@ int main() {
         accountController->updateUserAccount(sockfd, req);
     };
 
-    // --- Init dutch handlers ---
-    handlers["GET/dutch/normal"] = [&normalDutchController](int sockfd, const Request &req) {
-        normalDutchController->findOneNormalDutch(sockfd, req);
+    // --- Init normal dutch handlers ---
+    handlers["GET/dutch/all"] = [&normalDutchController](int sockfd, const Request &req) {
+        normalDutchController->findAllDutch(sockfd, req);
     };
-    handlers["GET/dutch/normal/user"] = [&normalDutchController](int sockfd, const Request &req) {
-        normalDutchController->findAllNormalDutch(sockfd, req);
+    handlers["GET/dutch"] = [&normalDutchController](int sockfd, const Request &req) {
+        normalDutchController->findOneDutch(sockfd, req);
     };
     handlers["POST/dutch/normal"] = [&normalDutchController](int sockfd, const Request &req) {
         normalDutchController->createNormalDutch(sockfd, req);
@@ -114,7 +117,13 @@ int main() {
     handlers["POST/dutch/normal/done"] = [&normalDutchController](int sockfd, const Request &req) {
         normalDutchController->doneNormalDutch(sockfd, req);
     };
-
+    // --- Init race dutch handlers ---
+    handlers["POST/dutch/race"] = [&raceDutchController](int sockfd, const Request &req) {
+        raceDutchController->createRaceDutch(sockfd, req);
+    };
+    handlers["POST/dutch/race/pay"] = [&raceDutchController](int sockfd, const Request &req) {
+        raceDutchController->payRaceDutch(sockfd, req);
+    };
     // --- Start listening for connections ---
     while (true) {
         socklen_t client = sizeof(cli_addr);
