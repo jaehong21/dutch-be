@@ -56,6 +56,15 @@ void UserController::createUser(int sockfd, const Request &request) {
     map<string, string> queryString = request.getQueryString();
     validQueryString(request, {"username", "password", "email"});
 
+    // uuid, username, password, email
+    vector<vector<string>> userStringList = this->userRepository->findAll();
+    for (auto userString : userStringList) {
+        if (userString[1] == queryString["username"])
+            throw BadRequestException("Username already exists");
+        if (userString[3] == queryString["email"])
+            throw BadRequestException("Email already exists");
+    }
+
     auto user = User(queryString["username"], queryString["password"], queryString["email"]);
     this->userRepository->create(user);
 
