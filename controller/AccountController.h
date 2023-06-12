@@ -12,6 +12,7 @@ class AccountController : public Controller {
     virtual ~AccountController() {}
 
     void findOneUserAccount(int sockfd, const Request &request);
+    void findOneDutchAccount(int sockfd, const Request &request);
     void updateUserAccount(int sockfd, const Request &request);
 
   private:

@@ -17,7 +17,7 @@ class RaceDutchController : public Controller {
 
     void createRaceDutch(int sockfd, const Request &request);
     void payRaceDutch(int sockfd, const Request &request);
-    // void doneRaceDutch(int sockfd, const Request &request);
+    void doneRaceDutch(int sockfd, const Request &request);
 
   private:
     static std::shared_ptr<RaceDutchController> instance;

@@ -98,6 +98,9 @@ int main() {
     handlers["GET/account/user"] = [&accountController](int sockfd, const Request &req) {
         accountController->findOneUserAccount(sockfd, req);
     };
+    handlers["GET/account/dutch"] = [&accountController](int sockfd, const Request &req) {
+        accountController->findOneDutchAccount(sockfd, req);
+    };
     handlers["PATCH/account/user"] = [&accountController](int sockfd, const Request &req) {
         accountController->updateUserAccount(sockfd, req);
     };
@@ -125,6 +128,10 @@ int main() {
     handlers["POST/dutch/race/pay"] = [&raceDutchController](int sockfd, const Request &req) {
         raceDutchController->payRaceDutch(sockfd, req);
     };
+    handlers["POST/dutch/race/done"] = [&raceDutchController](int sockfd, const Request &req) {
+        raceDutchController->doneRaceDutch(sockfd, req);
+    };
+
     // --- Start listening for connections ---
     while (true) {
         std::clock_t start = 0;

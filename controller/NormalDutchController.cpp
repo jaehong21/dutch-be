@@ -240,6 +240,8 @@ void NormalDutchController::doneNormalDutch(int sockfd, const Request &request) 
     if (query["user_uuid"] != dutchString[2])
         throw BadRequestException("user must be the owner of the dutch to retrieve the dutch");
     auto owner = this->getUser(query["user_uuid"]);
+    if (dutchString[1] != "normal")
+        throw BadRequestException("Dutch is not normal");
 
     // uuid, dutch_uuid, user_uuid, amount, send_at
     vector<vector<string>> ledgerStringList = this->ledgerRepository->findAll();

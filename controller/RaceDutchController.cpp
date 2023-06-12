@@ -143,6 +143,62 @@ void RaceDutchController::payRaceDutch(int sockfd, const Request &request) {
     response.execute(sockfd);
 }
 
+void RaceDutchController::doneRaceDutch(int sockfd, const Request &request) {
+    map<string, string> query = request.getQueryString();
+    validQueryString(request, {"dutch_uuid", "user_uuid"});
+
+    // uuid, type, owner, targetBalance
+    vector<string> dutchString = this->dutchRepository->find(query["dutch_uuid"]);
+    if (dutchString.size() < 4)
+        throw BadRequestException("Dutch not found");
+    if (query["user_uuid"] != dutchString[2])
+        throw BadRequestException("user must be the owner of the dutch to retrieve the dutch");
+    auto owner = this->getUser(query["user_uuid"]);
+    if (dutchString[1] != "race")
+        throw BadRequestException("Dutch is not normal");
+
+    // uuid, dutch_uuid, user_uuid, amount, send_at
+    vector<vector<string>> ledgerStringList = this->ledgerRepository->findAll();
+    vector<string> userUuidList, sendUserUuidList;
+    int sum = 0;
+    for (auto const &ledgerString : ledgerStringList) {
+        userUuidList.push_back(ledgerString[2]);
+
+        if (stoi(ledgerString[4]) > 0) { // send_at > 0 means the user has paid
+            sendUserUuidList.push_back(ledgerString[2]);
+            // add send amount to total sum
+            sum += stoi(ledgerString[3]);
+        }
+    }
+    if (sum < stoi(dutchString[3]))
+        throw BadRequestException("Dutch is not ended yet");
+
+    auto dutch = std::make_shared<NormalDutch>(dutchString[0], stoi(dutchString[3]), owner,
+                                               this->getUserList(userUuidList),
+                                               this->getUserList(sendUserUuidList));
+
+    // uuid, type, balance
+    vector<string> dutchAccountString = this->accountRepository->find(dutch->getUuid());
+    vector<string> ownerAccountString = this->accountRepository->find(owner->getUuid());
+    auto newDutchAccount = DutchAccount(dutch, owner, stoi(dutchAccountString[2]) - sum);
+    auto newOwnerAccount = UserAccount(owner, stoi(ownerAccountString[2]) + sum);
+
+    this->accountRepository->update(newDutchAccount.getUuid(), newDutchAccount);
+    this->accountRepository->update(newOwnerAccount.getUuid(), newOwnerAccount);
+
+    auto json = Json()
+                    .add("dutch_uuid", dutch->getUuid())
+                    .add("owner_uuid", owner->getUuid())
+                    .add("target_balance", dutch->getTargetBalance())
+                    .add("dutch_balance", newDutchAccount.getBalance())
+                    .add("owner_balance", newOwnerAccount.getBalance())
+                    .add("user_list", userUuidList)
+                    .add("send_user_list", sendUserUuidList);
+
+    auto response = Response(201, json);
+    response.execute(sockfd);
+}
+
 shared_ptr<User> RaceDutchController::getUser(const string &uuid) {
     vector<string> userString = this->userRepository->find(uuid);
     if (userString.size() < 4)

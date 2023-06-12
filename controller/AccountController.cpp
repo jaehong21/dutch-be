@@ -45,6 +45,26 @@ void AccountController::findOneUserAccount(int sockfd, const Request &request) {
     response.execute(sockfd);
 }
 
+void AccountController::findOneDutchAccount(int sockfd, const Request &request) {
+    map<string, string> query = request.getQueryString();
+    validQueryString(request, {"uuid"});
+
+    // uuid, type, balance
+    vector<string> accountString = this->accountRepository->find(query["uuid"]);
+    if (accountString.size() < 3)
+        throw BadRequestException("Account not found");
+    if (accountString[1] != "dutch")
+        throw BadRequestException("Account is not dutch account");
+
+    auto json = Json()
+                    .add("uuid", accountString[0])
+                    .add("type", accountString[1])
+                    .add("balance", accountString[2]);
+
+    auto response = Response(200, json);
+    response.execute(sockfd);
+}
+
 void AccountController::updateUserAccount(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"uuid", "balance"});
