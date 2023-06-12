@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <cstring>
+#include <ctime>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -126,6 +127,8 @@ int main() {
     };
     // --- Start listening for connections ---
     while (true) {
+        std::clock_t start = 0;
+
         socklen_t client = sizeof(cli_addr);
         int newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &client);
         if (newsockfd < 0) {
@@ -155,6 +158,11 @@ int main() {
             Response response(e.getStatusCode(), Json().add("msg", e.what()));
             response.execute(newsockfd);
         }
+
+        // HTTP request log for debugging
+        auto duration = (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000);
+        std::cout << "HTTP 1.1 " << req.getMethod() << " " << req.getPath() << " " << duration
+                  << "ms" << std::endl;
 
         close(newsockfd);
     }
