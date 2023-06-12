@@ -24,7 +24,7 @@ shared_ptr<NormalDutchController> NormalDutchController::getInstance(
     return instance;
 }
 
-void NormalDutchController::findOneNormalDutch(int sockfd, const Request &request) {
+void NormalDutchController::findOneDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"dutch_uuid"});
 
@@ -32,8 +32,6 @@ void NormalDutchController::findOneNormalDutch(int sockfd, const Request &reques
     vector<string> dutchString = this->dutchRepository->find(query["dutch_uuid"]);
     if (dutchString.size() < 4)
         throw BadRequestException("Dutch not found");
-    if (dutchString[1] != "normal")
-        throw BadRequestException("Dutch is not normal");
 
     // uuid, dutch_uuid, user_uuid, amount, send_at
     vector<vector<string>> ledgerStringList = this->ledgerRepository->findAll();
@@ -50,9 +48,14 @@ void NormalDutchController::findOneNormalDutch(int sockfd, const Request &reques
     }
 
     auto owner = this->getUser(dutchString[2]);
-    auto dutch = std::make_shared<NormalDutch>(dutchString[0], stoi(dutchString[3]), owner,
-                                               this->getUserList(userUuidList),
-                                               this->getUserList(sendUserUuidList));
+
+    auto dutch = dutchString[1] == "normal"
+                     ? std::make_shared<NormalDutch>(dutchString[0], stoi(dutchString[3]), owner,
+                                                     this->getUserList(userUuidList),
+                                                     this->getUserList(sendUserUuidList))
+                     : std::make_shared<RaceDutch>(dutchString[0], stoi(dutchString[3]), owner,
+                                                   this->getUserList(userUuidList),
+                                                   this->getUserList(sendUserUuidList));
 
     // uuid, type, balance
     vector<string> dutchAccountString = this->accountRepository->find(dutchString[0]);
@@ -83,7 +86,7 @@ void NormalDutchController::findOneNormalDutch(int sockfd, const Request &reques
     response.execute(sockfd);
 }
 
-void NormalDutchController::findAllNormalDutch(int sockfd, const Request &request) {
+void NormalDutchController::findAllDutch(int sockfd, const Request &request) {
     map<string, string> query = request.getQueryString();
     validQueryString(request, {"user_uuid"});
 

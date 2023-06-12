@@ -15,8 +15,8 @@ class NormalDutchController : public Controller {
         std::shared_ptr<Repository> dutchRepository, std::shared_ptr<Repository> ledgerRepository);
     virtual ~NormalDutchController() {}
 
-    void findOneNormalDutch(int sockfd, const Request &request);
-    void findAllNormalDutch(int sockfd, const Request &request);
+    void findOneDutch(int sockfd, const Request &request);
+    void findAllDutch(int sockfd, const Request &request);
     void createNormalDutch(int sockfd, const Request &request);
     void payNormalDutch(int sockfd, const Request &request);
     void doneNormalDutch(int sockfd, const Request &request);
