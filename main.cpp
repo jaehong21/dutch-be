@@ -101,7 +101,7 @@ int main() {
     handlers["GET/account/dutch"] = [&accountController](int sockfd, const Request &req) {
         accountController->findOneDutchAccount(sockfd, req);
     };
-    handlers["PATCH/account/user"] = [&accountController](int sockfd, const Request &req) {
+    handlers["POST/account/user/update"] = [&accountController](int sockfd, const Request &req) {
         accountController->updateUserAccount(sockfd, req);
     };
 
