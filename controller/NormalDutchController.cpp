@@ -71,7 +71,7 @@ void NormalDutchController::findOneDutch(int sockfd, const Request &request) {
                     .add("type", dutchString[1])
                     .add("owner", dutch->getOwner()->getUuid())
                     .add("owner_name", dutch->getOwner()->getUsername())
-                    .add("current_balance", dutchAccountString[2])
+                    .add("current_balance", stoi(dutchAccountString[2]))
                     .add("target_balance", dutch->getTargetBalance())
                     .add("user_list", userUuidList)
                     .add("user_name_list", userNameList)
@@ -268,6 +268,9 @@ void NormalDutchController::doneNormalDutch(int sockfd, const Request &request) 
     vector<string> ownerAccountString = this->accountRepository->find(owner->getUuid());
     auto newDutchAccount = DutchAccount(dutch, owner, stoi(dutchAccountString[2]) - sum);
     auto newOwnerAccount = UserAccount(owner, stoi(ownerAccountString[2]) + sum);
+
+    if (newDutchAccount.getBalance() <= 0)
+        throw BadRequestException("Dutch is done");
 
     this->accountRepository->update(newDutchAccount.getUuid(), newDutchAccount);
     this->accountRepository->update(newOwnerAccount.getUuid(), newOwnerAccount);
