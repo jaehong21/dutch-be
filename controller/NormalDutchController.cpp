@@ -269,8 +269,8 @@ void NormalDutchController::doneNormalDutch(int sockfd, const Request &request) 
     auto newDutchAccount = DutchAccount(dutch, owner, stoi(dutchAccountString[2]) - sum);
     auto newOwnerAccount = UserAccount(owner, stoi(ownerAccountString[2]) + sum);
 
-    if (newDutchAccount.getBalance() < 0)
-        throw BadRequestException("Dutch is done");
+    // if (newDutchAccount.getBalance() < 0)
+    //     throw BadRequestException("Dutch is done");
 
     this->accountRepository->update(newDutchAccount.getUuid(), newDutchAccount);
     this->accountRepository->update(newOwnerAccount.getUuid(), newOwnerAccount);
