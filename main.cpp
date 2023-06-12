@@ -117,8 +117,8 @@ int main() {
 
     // --- Start listening for connections ---
     while (true) {
-        socklen_t clilen = sizeof(cli_addr);
-        int newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
+        socklen_t client = sizeof(cli_addr);
+        int newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &client);
         if (newsockfd < 0) {
             std::cerr << "Error accepting connection" << std::endl;
             continue;

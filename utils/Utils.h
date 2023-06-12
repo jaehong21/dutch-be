@@ -5,6 +5,6 @@
 
 class Utils {
   public:
-    static std::vector<std::string> splitStringBySeperator(const std::string &text,
+    static std::vector<std::string> splitStringBySeparator(const std::string &text,
                                                            const std::string seperator);
 };

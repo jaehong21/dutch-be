@@ -122,7 +122,7 @@ void NormalDutchController::createNormalDutch(int sockfd, const Request &request
         throw BadRequestException("Target balance must be integer");
     }
 
-    vector<string> userUuidList = Utils::splitStringBySeperator(query["user_list"], ",");
+    vector<string> userUuidList = Utils::splitStringBySeparator(query["user_list"], ",");
     if (userUuidList.size() < 1)
         throw BadRequestException("User list must have at least 1 users");
 

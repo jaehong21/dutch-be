@@ -8,7 +8,7 @@ using std::string, std::vector, std::map;
 
 Request::Request(const string &request) : data(request) {
     // Split request string by newline character
-    vector<string> contents = Utils::splitStringBySeperator(request, "\n");
+    vector<string> contents = Utils::splitStringBySeparator(request, "\n");
     string firstLine = contents[0];
     size_t pos1 = firstLine.find(' ');
     size_t pos2 = firstLine.find(' ', pos1 + 1);
@@ -22,7 +22,7 @@ Request::~Request() {}
 map<string, string> Request::getQueryString() const {
     map<string, string> result;
     string queryStringStr = this->requestPath.substr(this->requestPath.find('?') + 1);
-    vector<string> queryStrings = Utils::splitStringBySeperator(queryStringStr, "&");
+    vector<string> queryStrings = Utils::splitStringBySeparator(queryStringStr, "&");
 
     for (const auto &query : queryStrings) {
         size_t pos = query.find('=');
@@ -37,7 +37,7 @@ map<string, string> Request::getQueryString() const {
 }
 
 string Request::getHeader(string headerKey) const {
-    vector<string> contents = Utils::splitStringBySeperator(this->data, "\n");
+    vector<string> contents = Utils::splitStringBySeparator(this->data, "\n");
     // Parse request method, host, and user agent
     for (const auto &line : contents) {
         string::size_type pos = line.find(": ");
