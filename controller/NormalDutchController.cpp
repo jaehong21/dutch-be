@@ -248,12 +248,14 @@ void NormalDutchController::doneNormalDutch(int sockfd, const Request &request) 
     vector<string> userUuidList, sendUserUuidList;
     int sum = 0;
     for (auto const &ledgerString : ledgerStringList) {
-        userUuidList.push_back(ledgerString[2]);
+        if (ledgerString[1] == dutchString[0]) {
+            userUuidList.push_back(ledgerString[2]);
 
-        if (stoi(ledgerString[4]) > 0) { // send_at > 0 means the user has paid
-            sendUserUuidList.push_back(ledgerString[2]);
-            // add send amount to total sum
-            sum += stoi(ledgerString[3]);
+            if (stoi(ledgerString[4]) > 0) { // send_at > 0 means the user has paid
+                sendUserUuidList.push_back(ledgerString[2]);
+                // add send amount to total sum
+                sum += stoi(ledgerString[3]);
+            }
         }
     }
     if (sum < stoi(dutchString[3]))
