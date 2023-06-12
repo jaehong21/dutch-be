@@ -50,7 +50,7 @@ class RaceDutch : public Dutch {
     virtual ~RaceDutch() {}
 
     std::vector<std::string> toString() override;
-}
+};
 
 class Ledger : public Entity {
   public:

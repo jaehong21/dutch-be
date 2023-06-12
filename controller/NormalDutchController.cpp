@@ -49,13 +49,9 @@ void NormalDutchController::findOneDutch(int sockfd, const Request &request) {
 
     auto owner = this->getUser(dutchString[2]);
 
-    auto dutch = dutchString[1] == "normal"
-                     ? std::make_shared<NormalDutch>(dutchString[0], stoi(dutchString[3]), owner,
-                                                     this->getUserList(userUuidList),
-                                                     this->getUserList(sendUserUuidList))
-                     : std::make_shared<RaceDutch>(dutchString[0], stoi(dutchString[3]), owner,
-                                                   this->getUserList(userUuidList),
-                                                   this->getUserList(sendUserUuidList));
+    auto dutch = std::make_shared<NormalDutch>(dutchString[0], stoi(dutchString[3]), owner,
+                                               this->getUserList(userUuidList),
+                                               this->getUserList(sendUserUuidList));
 
     // uuid, type, balance
     vector<string> dutchAccountString = this->accountRepository->find(dutchString[0]);
