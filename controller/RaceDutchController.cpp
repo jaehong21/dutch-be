@@ -9,6 +9,8 @@
 
 using std::string, std::vector, std::map, std::shared_ptr;
 
+#define RACE_DUTCH_REWARD 10
+
 shared_ptr<RaceDutchController> RaceDutchController::instance = nullptr;
 
 shared_ptr<RaceDutchController> RaceDutchController::getInstance(
@@ -160,6 +162,7 @@ void RaceDutchController::doneRaceDutch(int sockfd, const Request &request) {
     // uuid, dutch_uuid, user_uuid, amount, send_at
     vector<vector<string>> ledgerStringList = this->ledgerRepository->findAll();
     vector<string> userUuidList, sendUserUuidList;
+    map<string, long> userSendTimeMap; // <userUuid, sendTime>
     int sum = 0;
     for (auto const &ledgerString : ledgerStringList) {
         if (ledgerString[1] == dutchString[0]) {
@@ -167,6 +170,8 @@ void RaceDutchController::doneRaceDutch(int sockfd, const Request &request) {
 
             if (stoi(ledgerString[4]) > 0) { // send_at > 0 means the user has paid
                 sendUserUuidList.push_back(ledgerString[2]);
+                // add user send_time to map
+                userSendTimeMap[ledgerString[2]] = stol(ledgerString[4]);
                 // add send amount to total sum
                 sum += stoi(ledgerString[3]);
             }
@@ -179,17 +184,24 @@ void RaceDutchController::doneRaceDutch(int sockfd, const Request &request) {
                                                this->getUserList(userUuidList),
                                                this->getUserList(sendUserUuidList));
 
+    // find user_uuid with the lowest send_time
+    auto fastUserUuid = Utils::getKeyWithLowestValue(userSendTimeMap);
+
     // uuid, type, balance
     vector<string> dutchAccountString = this->accountRepository->find(dutch->getUuid());
     vector<string> ownerAccountString = this->accountRepository->find(owner->getUuid());
+    vector<string> fastUserAccountString = this->accountRepository->find(fastUserUuid);
     auto newDutchAccount = DutchAccount(dutch, owner, stoi(dutchAccountString[2]) - sum);
     auto newOwnerAccount = UserAccount(owner, stoi(ownerAccountString[2]) + sum);
+    auto fastUserAccount = UserAccount(this->getUser(fastUserUuid),
+                                       stoi(fastUserAccountString[2]) + RACE_DUTCH_REWARD);
 
-    // if (newDutchAccount.getBalance() != 0)
-    //     throw BadRequestException("Dutch is done");
+    if (newDutchAccount.getBalance() < 0)
+        throw BadRequestException("Dutch is already done");
 
     this->accountRepository->update(newDutchAccount.getUuid(), newDutchAccount);
     this->accountRepository->update(newOwnerAccount.getUuid(), newOwnerAccount);
+    this->accountRepository->update(fastUserAccount.getUuid(), fastUserAccount);
 
     auto json = Json()
                     .add("dutch_uuid", dutch->getUuid())
