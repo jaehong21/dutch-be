@@ -201,7 +201,9 @@ void RaceDutchController::doneRaceDutch(int sockfd, const Request &request) {
 
     this->accountRepository->update(newDutchAccount.getUuid(), newDutchAccount);
     this->accountRepository->update(newOwnerAccount.getUuid(), newOwnerAccount);
-    this->accountRepository->update(fastUserAccount.getUuid(), fastUserAccount);
+    // update fast user account if the fast user is not the owner
+    if (ownerUuid != fastUserUuid)
+        this->accountRepository->update(fastUserAccount.getUuid(), fastUserAccount);
 
     auto json = Json()
                     .add("dutch_uuid", dutch->getUuid())
