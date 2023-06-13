@@ -28,14 +28,14 @@ This Going Dutch Backend server is implemented with **zero-library**. Every line
 
    ```bash
    cd dutch-be
-   docker build -t dutch-be .
+   sudo docker build -t dutch-be .
    ```
 
 4. Run the Docker container:
 
    ```bash
    # make sure port 8080 is not in use
-   docker run -p 8080:8080 dutch-be
+   sudo docker run -p 8080:8080 dutch-be
    ```
 
 5. The application should now be running at `http://localhost:8080`.
