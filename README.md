@@ -67,10 +67,6 @@ We strongly use docker rather than makefile. Because makefile can be dependent o
 
 ## Input/Output Sample
 
-⚠️⚠️ **_We strongly warn not to call APIs below directly_**, because it can cause unexpected errors. Please use the frontend application to call APIs.
-
-Our API is accessible at `https://api.dutch.jaehong21.com`.
-
 ### User
 
 - **POST /user**
